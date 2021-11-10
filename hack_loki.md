@@ -41,6 +41,7 @@ Then restart all loki pods to update configmap
 
 ## Loki & Grafana stack with Helm
 
+Deploy [loki and grafana](https://grafana.com/docs/loki/latest/installation/helm/#deploy-grafana-to-your-cluster) to your cluster from official images using helm
 ```bash
 helm upgrade --install loki grafana/loki-stack --set promtail.enabled=false
 helm install loki-grafana grafana/grafana

@@ -54,6 +54,13 @@ Login : `admin`
 Password should be retreive with :
 `kubectl get secret loki-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo`
 
+### Troubleshooting
+If loki-grafana deployment fails with following error on OpenShift:
+Error creating: pods "loki-grafana-XXXXXXXXXX" is forbidden: unable to validate against any security context
+
+Simply run:
+`oc adm policy add-scc-to-group anyuid system:authenticated`
+
 ## Grafana from Image
 
 Create [grafana instance](https://grafana.com/docs/grafana/latest/installation/kubernetes/) from official image

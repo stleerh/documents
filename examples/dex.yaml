@@ -226,6 +226,10 @@ spec:
       -----BEGIN ENCRYPTED PRIVATE KEY-----
       <MY_TRUSTED_CA_KEY>
       -----END ENCRYPTED PRIVATE KEY-----
+    caCertificate: |-
+      -----BEGIN CERTIFICATE-----
+      <MY_CA_CERT>
+      -----END CERTIFICATE-----
   to:
     kind: Service
     name: dex

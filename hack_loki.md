@@ -22,44 +22,31 @@ cd loki-operator
 ```
 
 Disable loki auth for development in [loki-config.yaml](https://github.com/ViaQ/loki-operator/blob/master/internal/manifests/internal/config/loki-config.yaml#L2)
-`sed -i 's/auth_enabled: true/auth_enabled: false/g' /internal/manifests/internal/config/loki-config.yaml`
-
-Build and push the container image and then deploy the operator
-`make oci-build oci-push deploy REGISTRY_ORG=netobserv VERSION=latest`
-
-Create a LokiStack instance to get the various components of Loki up and running
-`kubectl apply -f hack/lokistack_dev.yaml`
-
-This will create `distributor`, `compactor`, `ingester`, `querier` and `query-frontend` components.
-
-### From image (WARNING WIP, need kubectl [1.23.0-alpha.4](https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-1.23.md#v1230-alpha4) or more. Issues on /host access in debug ephemeral container)
-
-Get operator from official image and create instance
 ```bash
-kubectl apply -f examples/lokioperator.yaml
-kubectl apply -f examples/lokistack_dev.yaml
+sed -i 's/auth_enabled: true/auth_enabled: false/g' /internal/manifests/internal/config/loki-config.yaml
 ```
 
-Get controller manager name
-`kubectl get pods -l name=loki-operator-controller-manager`
+Build and push the container image and then deploy the operator
+```bash
+make oci-build oci-push deploy REGISTRY_ORG=netobserv VERSION=latest
+```
 
-Create ephemeral container using controller manager name like :
-`kubectl debug controller-manager-9cb578d85-5dcxg -it --target=manager --image=busybox`
-
-Disable auth in loki config 
-`sed -i 's/auth_enabled: true/auth_enabled: false/g' /host/workspace/internal/manifests/internal/config/loki-config.yaml`
-
-Then restart all loki pods to update configmap
-`kubectl get pods -n default --no-headers=true | awk '/loki-/{print $1}'| xargs  kubectl delete -n default pod`
+Create a LokiStack instance to get the various components of Loki up and running
+```bash
+kubectl apply -f hack/lokistack_dev.yaml
+```
 
 This will create `distributor`, `compactor`, `ingester`, `querier` and `query-frontend` components.
 
 ## Loki Operator on Openshift
 Loki operator on Openshift will allow you to configure [gateway](https://github.com/observatorium/api) for loki multi-tenancy & authentication
 
+Check [Dev Preview Docs](https://github.com/ViaQ/loki-operator/pull/99)
+
 ### Requirements
 - Install oc CLI for communicating with the cluster.
-- Running Openshift cluster with a valid certificate for dex route.
+- Running Openshift cluster
+- [Configured DEX](https://github.com/netobserv/documents/blob/main/hack_dex.md)
 - A container registry that you and your openshift cluster can reach.
 
 ### Setup
@@ -79,19 +66,34 @@ aws s3api create-bucket --bucket netobserv-loki --region us-east-1
 oc -n openshift-logging create secret generic test --from-literal=endpoint="https://s3.us-east-1.amazonaws.com" --from-literal=region="eu-east-1" --from-literal=bucketnames="netobserv-loki" --from-literal=access_key_id="XXXXXXXXXXXXXXXXXXXX" --from-literal=access_key_secret="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ```
 
-Create LokiStack instance
+Update DEX route in `hack/lokistack_gateway_dev.yaml`
+
+Create LokiStack instance with static mode:
+```bash
+oc -n openshift-logging apply -f hack/lokistack_gateway_dev.yaml
+```
+
+OR
+
 Open your Openshift Administrator Console and go to:
     Installed Operators => Openshift Loki Operator (in openshift-logging namespace) 
     Click on `Create instance` in LokiStacks card
-    Copy / Paste `hack/lokistack_gateway_dev.yaml` content from sources to YAML tab and update it if needed
+    Copy / Paste `hack/lokistack_gateway_dev.yaml` content from sources to YAML tab
 
 This will create `distributor`, `compactor`, `ingester`, `querier`, `query-frontend` and `lokistack-gateway` components.
 
 ### Troubleshooting
+- AWS region not set for deploy-example-secret.sh
+If `aws configure get region` returns blank, the shell will fail. 
+You can force region using `aws configure --region us-east-1` for example.
+
 - Insuffisant CPU or Memory
 If your pods hang in `Pending` state, you should double check their status using `oc describe`
 We recommand to use size: 1x.extra-small but this still require a lot of ressources. 
 You can decrese them in internal/manifests/internal/sizes.go and set `100m` for each CPUs and `256Mi` for each Memories
+
+- Certificate errors in Gateway logs
+Check [Patch Loki Operator Deployment](https://github.com/netobserv/documents/blob/main/hack_dex.md#Patch-Loki-Operator-Deployment)
 
 ## Loki & Grafana stack with Helm
 
@@ -102,11 +104,15 @@ helm install loki-grafana grafana/grafana
 ```
 
 Wait for the service running then forward port
-`kubectl port-forward service/loki-grafana 3000:80`
+```bash
+kubectl port-forward service/loki-grafana 3000:80
+```
 
 Login : `admin`
 Password should be retreive with :
-`kubectl get secret loki-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo`
+```bash
+kubectl get secret loki-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+```
 
 ### Troubleshooting
 If loki-grafana deployment fails with following error on OpenShift:
@@ -124,10 +130,14 @@ If you installed loki using the operator, you will not have grafana installed. Y
 ### From Image
 
 Create [grafana instance](https://grafana.com/docs/grafana/latest/installation/kubernetes/) from official image
-`kubectl apply -f examples/grafana.yaml`
+```bash
+kubectl apply -f examples/grafana.yaml
+```
 
 Wait for the service running then forward port
-`kubectl port-forward service/grafana 3000:3000`
+```bash
+kubectl port-forward service/grafana 3000:3000
+```
 
 Login : `admin`
 Password : `admin`

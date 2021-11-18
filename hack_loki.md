@@ -2,8 +2,8 @@
 This file will help you using [loki-operator](https://github.com/ViaQ/loki-operator) since it's still WIP project.
 You can check [this PR](https://github.com/ViaQ/loki-operator/pull/99) for dev usage and the [README.md](https://github.com/ViaQ/loki-operator/blob/master/README.md) file for status
 
-## Loki Operator on Kind
-Loki operator can be run without gateway for debug on kind. It will create the same ressources as helm lokistack installation:
+## Loki Operator without gateway
+Loki operator can be run without gateway for debug on kind or Openshift. It will create the same ressources as helm lokistack installation:
 `distributor`, `compactor`, `ingester`, `querier`, `query-frontend`
 
 Check [loki components](https://grafana.com/docs/loki/latest/fundamentals/architecture/#components) before getting started.
@@ -23,7 +23,7 @@ cd loki-operator
 
 Disable loki auth for development in [loki-config.yaml](https://github.com/ViaQ/loki-operator/blob/master/internal/manifests/internal/config/loki-config.yaml#L2)
 ```bash
-sed -i 's/auth_enabled: true/auth_enabled: false/g' /internal/manifests/internal/config/loki-config.yaml
+sed -i 's/auth_enabled: true/auth_enabled: false/g' internal/manifests/internal/config/loki-config.yaml
 ```
 
 Build and push the container image and then deploy the operator

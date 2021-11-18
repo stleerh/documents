@@ -217,19 +217,8 @@ spec:
   port:
     targetPort: 5556
   tls:
-    termination: edge
-    certificate: |-
-      -----BEGIN CERTIFICATE-----
-      <MY_TRUSTED_CA_CERT>
-      -----END CERTIFICATE-----
-    key: |-
-      -----BEGIN ENCRYPTED PRIVATE KEY-----
-      <MY_TRUSTED_CA_KEY>
-      -----END ENCRYPTED PRIVATE KEY-----
-    caCertificate: |-
-      -----BEGIN CERTIFICATE-----
-      <MY_CA_CERT>
-      -----END CERTIFICATE-----
+    termination: passthrough
+    insecureEdgeTerminationPolicy: None
   to:
     kind: Service
     name: dex

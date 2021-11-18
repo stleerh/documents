@@ -93,7 +93,7 @@ We recommand to use size: 1x.extra-small but this still require a lot of ressour
 You can decrese them in internal/manifests/internal/sizes.go and set `100m` for each CPUs and `256Mi` for each Memories
 
 - Certificate errors in Gateway logs
-Check [Patch Loki Operator Deployment](https://github.com/netobserv/documents/blob/main/hack_dex.md#Patch-Loki-Operator-Deployment)
+Check [ZeroSSL.com CA with acme.sh](https://github.com/netobserv/documents/blob/main/hack_dex.md#-ZeroSSL.com-CA-with-acme.sh)
 
 ## Loki & Grafana stack with Helm
 

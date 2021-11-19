@@ -1,0 +1,266 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dex
+  namespace: openshift-logging
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dex
+rules:
+- apiGroups:
+  - "dex.coreos.com"
+  resources:
+  - "*"
+  verbs:
+  - "*"
+- apiGroups:
+  - "apiextensions.k8s.io"
+  resources:
+  - "customresourcedefinitions"
+  verbs:
+  - "create"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dex
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dex
+subjects:
+- kind: ServiceAccount
+  name: dex
+  namespace: openshift-logging
+---
+kind: OAuthClient
+apiVersion: oauth.openshift.io/v1
+metadata:
+ name: dex
+secret: dexidp
+redirectURIs:
+ - "https://dex-openshift-logging.apps.<MY_CLUSTER_URL>/dex/callback"
+grantMethod: prompt
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dex-openshift
+  namespace: openshift-config
+type: Opaque
+data:
+  clientSecret: cGFzc3dvcmQK
+---
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
+  identityProviders:
+  - name: dex
+    mappingMethod: claim
+    type: OpenID
+    openID:
+      clientID: openshift
+      clientSecret:
+        name: dex-openshift
+      ca:
+        name: kube-root-ca.crt
+      claims:
+        preferredUsername:
+        - preferred_username
+        name:
+        - name
+        email:
+        - email
+      extraScopes:
+      - email
+      - profile
+      issuer: https://dex-openshift-logging.apps.<MY_CLUSTER_URL>/dex
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dex
+  namespace: openshift-logging
+data:
+  config.yaml: |
+    issuer: https://dex-openshift-logging.apps.<MY_CLUSTER_URL>/dex/
+    storage:
+      type: kubernetes
+      config:
+        inCluster: true
+    grpc:
+      addr: 127.0.0.1:5557
+      tlsCert: /etc/dex/tls/tls.crt
+      tlsKey: /etc/dex/tls/tls.key
+      tlsClientCA: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+    web:
+      https: 0.0.0.0:5556
+      tlsCert: /etc/dex/tls/tls.crt
+      tlsKey: /etc/dex/tls/tls.key
+    telemetry:
+      http: 0.0.0.0:5558
+    logger:
+      level: debug
+    oauth2:
+      alwaysShowLoginScreen: true
+      passwordConnector: local
+    connectors:
+    - type: openshift
+      id: openshift
+      name: OpenShift
+      config:
+        issuer: https://api.<MY_CLUSTER_URL>:6443
+        clientID: dex
+        clientSecret: dex-openshift
+        redirectURI: https://dex-openshift-logging.apps.<MY_CLUSTER_URL>/dex/callback
+        rootCA: /etc/ssl/openshift.pem
+        insecureCA: true
+    staticClients:
+    - id: grafana
+      redirectURIs:
+      - "http://grafana-route-openshift-logging.apps.<MY_CLUSTER_URL>/login/generic_oauth"
+      name: grafana
+      secret: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+    - id: openshift
+      name: openshift
+      redirectURIs:
+      - 'https://oauth-openshift.apps.<MY_CLUSTER_URL>/oauth2callback/dex'
+      secret: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+    enablePasswordDB: true
+    staticPasswords:
+    - email: "cluster-admin@example.com"
+      # bcrypt hash of the string "password"
+      hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+      username: "cluster-admin"
+      userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dex
+  namespace: openshift-logging
+spec:
+  replicas:
+  selector:
+    matchLabels:
+      app: dex
+  template:
+    metadata:
+      labels:
+        app: dex
+    spec:
+      serviceAccountName: dex
+      containers:
+      - image: ghcr.io/dexidp/dex:v2.30.0
+        name: dex
+        command: ["/usr/local/bin/dex", "serve", "/etc/dex/cfg/config.yaml"]
+        ports:
+        - name: web
+          containerPort: 5556
+        - name: api
+          containerPort: 5557
+        - name: telemetry
+          containerPort: 5558
+        volumeMounts:
+        - name: config
+          mountPath: /etc/dex/cfg
+        - name: tls
+          mountPath: /etc/dex/tls
+      volumes:
+      - name: config
+        configMap:
+          name: dex
+          items:
+          - key: config.yaml
+            path: config.yaml
+      - name: tls
+        secret:
+          secretName: dex
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: dex
+  name: dex
+  namespace: openshift-logging
+spec:
+  type: ClusterIP
+  ports:
+  - name: web
+    port: 5556
+    protocol: TCP
+    targetPort: 5556
+  - name: api
+    port: 5557
+    protocol: TCP
+    targetPort: 5557
+  - name: telemetry
+    port: 5558
+    protocol: TCP
+    targetPort: 5558
+  selector:
+    app: dex
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: dex
+  namespace: openshift-logging
+spec:
+  path: /
+  port:
+    targetPort: 5556
+  tls:
+    termination: reencrypt
+    certificate: |-
+      -----BEGIN CERTIFICATE-----
+      <MY_TRUSTED_CA_CERT>
+      -----END CERTIFICATE-----
+    key: |-
+      -----BEGIN ENCRYPTED PRIVATE KEY-----
+      <MY_TRUSTED_CA_KEY>
+      -----END ENCRYPTED PRIVATE KEY-----
+    caCertificate: |-
+      -----BEGIN CERTIFICATE-----
+      <MY_CA_CERT>
+      -----END CERTIFICATE-----
+  to:
+    kind: Service
+    name: dex
+    weight: 100
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: metrics
+  namespace: openshift-logging
+spec:
+  path: /
+  port:
+    targetPort: 8443
+  tls:
+    termination: reencrypt
+    certificate: |-
+      -----BEGIN CERTIFICATE-----
+      <MY_TRUSTED_CA_CERT>
+      -----END CERTIFICATE-----
+    key: |-
+      -----BEGIN ENCRYPTED PRIVATE KEY-----
+      <MY_TRUSTED_CA_KEY>
+      -----END ENCRYPTED PRIVATE KEY-----
+    caCertificate: |-
+      -----BEGIN CERTIFICATE-----
+      <MY_CA_CERT>
+      -----END CERTIFICATE-----
+  to:
+    kind: Service
+    name: loki-operator-controller-manager-metrics-service
+    weight: 100
+  wildcardPolicy: None

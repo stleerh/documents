@@ -66,7 +66,7 @@ aws s3api create-bucket --bucket netobserv-loki --region us-east-1
 oc -n openshift-logging create secret generic test --from-literal=endpoint="https://s3.us-east-1.amazonaws.com" --from-literal=region="eu-east-1" --from-literal=bucketnames="netobserv-loki" --from-literal=access_key_id="XXXXXXXXXXXXXXXXXXXX" --from-literal=access_key_secret="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ```
 
-Update DEX route in `hack/lokistack_gateway_dev.yaml`
+Update `dex` and `metrics` routes in `hack/lokistack_gateway_dev.yaml`
 
 Create LokiStack instance with static mode:
 ```bash

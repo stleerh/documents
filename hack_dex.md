@@ -42,6 +42,8 @@ oc patch apiserver cluster \
 ## Create dex instance
 Replace all `<MY_CLUSTER_URL>` occurences in `examples/dex.yaml`.
 
+Copy your `api.XXX.cer` content to `certificate`, `api.XXX.key` content to `key` and `ca.cer` to `caCertificate` in Route tls specs in `examples/dex.yaml`
+
 Create dex instance in openshift-logging namespace:
 ```bash
 oc create namespace openshift-logging

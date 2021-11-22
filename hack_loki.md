@@ -38,7 +38,7 @@ kubectl apply -f hack/lokistack_dev.yaml
 
 This will create `distributor`, `compactor`, `ingester`, `querier` and `query-frontend` components.
 
-## Loki Operator on Openshift
+## Loki Operator on Openshift (WIP, gateway is [still unstable](https://github.com/ViaQ/loki-operator/pull/100/) and configuration may change)
 Loki operator on Openshift will allow you to configure [gateway](https://github.com/observatorium/api) for loki multi-tenancy & authentication
 
 Check [Dev Preview Docs](https://github.com/ViaQ/loki-operator/pull/99)
@@ -66,7 +66,17 @@ aws s3api create-bucket --bucket netobserv-loki --region us-east-1
 oc -n openshift-logging create secret generic test --from-literal=endpoint="https://s3.us-east-1.amazonaws.com" --from-literal=region="eu-east-1" --from-literal=bucketnames="netobserv-loki" --from-literal=access_key_id="XXXXXXXXXXXXXXXXXXXX" --from-literal=access_key_secret="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ```
 
-Update `dex` and `metrics` routes in `hack/lokistack_gateway_dev.yaml`
+Create tenant secret with cliendID, clientSecret and ca:
+```bash
+oc create -n openshift-logging secret generic test1 --from-literal=clientID="test"  --from-literal=clientSecret="secret" --from-literal=issuerCAPath="/local/path/to/ca.crt"
+```
+`issuerCAPath` can be left empty if you want to use server default API CA file.
+
+Update `dex` and `metrics` routes in `hack/lokistack_gateway_dev.yaml`:
+```yaml
+    issuerURL: https://dex-openshift-logging.apps.<MY_CLUSTER_URL>/dex/
+    redirectURL: https://loki-operator-controller-manager-metrics-service.openshift-logging.svc.cluster.local/oidc/tenant-a/callback
+```
 
 Create LokiStack instance with static mode:
 ```bash
@@ -81,6 +91,30 @@ Open your Openshift Administrator Console and go to:
     Copy / Paste `hack/lokistack_gateway_dev.yaml` content from sources to YAML tab
 
 This will create `distributor`, `compactor`, `ingester`, `querier`, `query-frontend` and `lokistack-gateway` components.
+
+
+You can create a route to check gateway status at following URL:
+`https://gateway-openshift-logging.apps.<MY_CLUSTER_URL>/`
+
+Using the following yaml:
+```yaml
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: gateway
+  namespace: openshift-logging
+spec:
+  path: /
+  port:
+    targetPort: 8081
+  tls:
+    termination: reencrypt
+  to:
+    kind: Service
+    name: lokistack-gateway-http-lokistack-dev
+    weight: 100
+  wildcardPolicy: None
+```
 
 ### Troubleshooting
 - AWS region not set for deploy-example-secret.sh
@@ -171,7 +205,7 @@ Open http://localhost:3000/ and login with `admin` + password according to previ
 Select "add datasource" => "Loki" and set your source :
 - `http://loki:3100` for helm
 - `http://loki-query-frontend-http-lokistack-dev.default.svc.cluster.local:3100` for loki-operator without gateway
-- `YOUR_GATEWAY_ROUTE/api/logs/v1/tenant-a` for loki-operator with gateway enabled using `tenant-a` endpoint
+- `lokistack-gateway-http-lokistack-dev.openshift-logging.svc.cluster.local:8080/api/logs/v1/tenant-a` for loki-operator with gateway enabled using `tenant-a` endpoint
 
 You should get "Data source connected and labels found." after clicking Save & Test button
 

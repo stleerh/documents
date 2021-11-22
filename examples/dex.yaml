@@ -218,49 +218,8 @@ spec:
     targetPort: 5556
   tls:
     termination: reencrypt
-    certificate: |-
-      -----BEGIN CERTIFICATE-----
-      <MY_TRUSTED_CA_CERT>
-      -----END CERTIFICATE-----
-    key: |-
-      -----BEGIN ENCRYPTED PRIVATE KEY-----
-      <MY_TRUSTED_CA_KEY>
-      -----END ENCRYPTED PRIVATE KEY-----
-    caCertificate: |-
-      -----BEGIN CERTIFICATE-----
-      <MY_CA_CERT>
-      -----END CERTIFICATE-----
   to:
     kind: Service
     name: dex
-    weight: 100
-  wildcardPolicy: None
----
-apiVersion: route.openshift.io/v1
-kind: Route
-metadata:
-  name: metrics
-  namespace: openshift-logging
-spec:
-  path: /
-  port:
-    targetPort: 8443
-  tls:
-    termination: reencrypt
-    certificate: |-
-      -----BEGIN CERTIFICATE-----
-      <MY_TRUSTED_CA_CERT>
-      -----END CERTIFICATE-----
-    key: |-
-      -----BEGIN ENCRYPTED PRIVATE KEY-----
-      <MY_TRUSTED_CA_KEY>
-      -----END ENCRYPTED PRIVATE KEY-----
-    caCertificate: |-
-      -----BEGIN CERTIFICATE-----
-      <MY_CA_CERT>
-      -----END CERTIFICATE-----
-  to:
-    kind: Service
-    name: loki-operator-controller-manager-metrics-service
     weight: 100
   wildcardPolicy: None

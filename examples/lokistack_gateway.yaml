@@ -1,0 +1,55 @@
+apiVersion: loki.openshift.io/v1beta1
+kind: LokiStack
+metadata:
+  name: lokistack-dev
+spec:
+  size: 1x.extra-small
+  replicationFactor: 1
+  storage:
+    secret:
+      name: test
+  storageClassName: gp2
+  tenants:
+    mode: static
+    authentication:
+      - tenantName: tenant-a
+        tenantId: tenant-a
+        oidc:
+          secret:
+            name: tenant-a
+          issuerURL: https://dex-openshift-logging.apps.<MY_CLUSTER_URL>/dex/
+          redirectURL: http://gateway-openshift-logging.apps.<MY_CLUSTER_URL>/oidc/tenant-a/callback
+          usernameClaim: email
+          groupClaim: ''
+    authorization:
+      roleBindings:
+      - name: tenant-a-read-write
+        roles:
+          - read-write
+        subjects:
+          - kind: user
+            name: admin
+      - name: tenant-a-read-only
+        roles:
+          - read-only
+        subjects:
+          - kind: user
+            name: foo
+      roles:
+      - name: read-write
+        permissions:
+          - read
+          - write
+        resources:
+          - metrics
+          - logs
+        tenants:
+          - tenant-a
+      - name: read-only
+        permissions:
+          - read
+        resources:
+          - metrics
+          - logs
+        tenants:
+          - tenant-a

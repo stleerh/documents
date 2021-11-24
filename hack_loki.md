@@ -38,10 +38,10 @@ kubectl apply -f hack/lokistack_dev.yaml
 
 This will create `distributor`, `compactor`, `ingester`, `querier` and `query-frontend` components.
 
-## Loki Operator on Openshift
+## Loki Operator on Openshift (WIP, gateway is [still unstable](https://github.com/ViaQ/loki-operator/pull/100/) and configuration may change)
 Loki operator on Openshift will allow you to configure [gateway](https://github.com/observatorium/api) for loki multi-tenancy & authentication
 
-Check [Dev Preview Docs](https://github.com/ViaQ/loki-operator/pull/99)
+Check [Docs](https://github.com/ViaQ/loki-operator/tree/master/docs)
 
 ### Requirements
 - Install oc CLI for communicating with the cluster.
@@ -66,7 +66,22 @@ aws s3api create-bucket --bucket netobserv-loki --region us-east-1
 oc -n openshift-logging create secret generic test --from-literal=endpoint="https://s3.us-east-1.amazonaws.com" --from-literal=region="eu-east-1" --from-literal=bucketnames="netobserv-loki" --from-literal=access_key_id="XXXXXXXXXXXXXXXXXXXX" --from-literal=access_key_secret="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ```
 
-Update `dex` and `metrics` routes in `hack/lokistack_gateway_dev.yaml`
+Create tenant secret with cliendID, clientSecret and ca according to your dex configuration:
+```bash
+oc create -n openshift-logging secret generic tenant-a --from-literal=clientID="tenant-a"  --from-literal=clientSecret="password" --from-literal=issuerCAPath=""
+```
+`issuerCAPath` can be left empty if you want to use server default API CA file. Else use relative path in gateway pod.
+
+Update `oidc secret name`, `issuerURL` and `redirectURL` routes in `hack/lokistack_gateway_dev.yaml`:
+```yaml
+    secret:
+        name: tenant-a
+    issuerURL: https://dex-openshift-logging.apps.<MY_CLUSTER_URL>/dex/
+    redirectURL:  http://gateway-openshift-logging.apps.<MY_CLUSTER_URL>/oidc/tenant-a/callback
+```
+You can check `examples/lokistack_gateway.yaml` in this repository for a compatible configuration with static users created in `examples/dex.yaml`. 
+`usernameClaim` will take dex email and `groupClaim` is empty since DEX staticPasswords doesn't support groups.
+`subjects` users are taken from Openshift users matching with identities.
 
 Create LokiStack instance with static mode:
 ```bash
@@ -81,6 +96,18 @@ Open your Openshift Administrator Console and go to:
     Copy / Paste `hack/lokistack_gateway_dev.yaml` content from sources to YAML tab
 
 This will create `distributor`, `compactor`, `ingester`, `querier`, `query-frontend` and `lokistack-gateway` components.
+
+Create gateway and gateway-status routes:
+```bash
+oc -n openshift-logging apply -f examples/gateway_routes.yaml
+```
+
+You check gateway status browsing:
+`https://gateway-status-openshift-logging.apps.<MY_CLUSTER_URL>`
+
+Loki will now be exposed at:
+`http://gateway-openshift-logging.apps.<MY_CLUSTER_URL>/api/logs/v1/tenant-a/loki/`
+Check available routes in [api/logs/v1/http.go](https://github.com/observatorium/api/blob/main/api/logs/v1/http.go#L132)
 
 ### Troubleshooting
 - AWS region not set for deploy-example-secret.sh
@@ -127,10 +154,11 @@ oc adm policy add-scc-to-user anyuid -z loki-grafana
 ## Grafana
 If you installed loki using the operator, you will not have grafana installed. You may need to install it to make queries and dashboards but it's not mandatory to make loki work.
 
-### From Image
-
-Create [grafana instance](https://grafana.com/docs/grafana/latest/installation/kubernetes/) from official image
+### From Image with oauth
+Create [grafana instance](https://grafana.com/docs/grafana/latest/installation/kubernetes/) from official image.
+Update `examples/grafana.ini` configuration and run:
 ```bash
+kubectl create configmap grafana-config --from-file=examples/grafana.ini
 kubectl apply -f examples/grafana.yaml
 ```
 
@@ -171,7 +199,7 @@ Open http://localhost:3000/ and login with `admin` + password according to previ
 Select "add datasource" => "Loki" and set your source :
 - `http://loki:3100` for helm
 - `http://loki-query-frontend-http-lokistack-dev.default.svc.cluster.local:3100` for loki-operator without gateway
-- `YOUR_GATEWAY_ROUTE/api/logs/v1/tenant-a` for loki-operator with gateway enabled using `tenant-a` endpoint
+- `lokistack-gateway-http-lokistack-dev.openshift-logging.svc.cluster.local:8080/api/logs/v1/tenant-a` for loki-operator with gateway enabled using `tenant-a` endpoint
 
 You should get "Data source connected and labels found." after clicking Save & Test button
 

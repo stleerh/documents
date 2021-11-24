@@ -1,0 +1,31 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: gateway
+  namespace: openshift-logging
+spec:
+  path: /
+  port:
+    targetPort: 8080
+  to:
+    kind: Service
+    name: lokistack-gateway-http-lokistack-dev
+    weight: 100
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: gateway-status
+  namespace: openshift-logging
+spec:
+  path: /
+  port:
+    targetPort: 8081
+  tls:
+    termination: reencrypt
+  to:
+    kind: Service
+    name: lokistack-gateway-http-lokistack-dev
+    weight: 100
+  wildcardPolicy: None

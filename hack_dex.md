@@ -42,10 +42,28 @@ oc patch apiserver cluster \
 ## Create dex instance
 Replace all `<MY_CLUSTER_URL>` occurences in `examples/dex.yaml`.
 
-Copy your `api.XXX.cer` content to `certificate`, `api.XXX.key` content to `key` and `ca.cer` to `caCertificate` in Route tls specs in `examples/dex.yaml`
+By default, routes will use your API cert for `reencrypt`. 
+You can change them by adding the following options in the tls sections if needed:
+```yaml
+    certificate: |-
+      -----BEGIN CERTIFICATE-----
+      <MY_TRUSTED_CA_CERT>
+      -----END CERTIFICATE-----
+    key: |-
+      -----BEGIN ENCRYPTED PRIVATE KEY-----
+      <MY_TRUSTED_CA_KEY>
+      -----END ENCRYPTED PRIVATE KEY-----
+    caCertificate: |-
+      -----BEGIN CERTIFICATE-----
+      <MY_CA_CERT>
+      -----END CERTIFICATE-----
+```
 
 Create dex instance in openshift-logging namespace:
 ```bash
 oc create namespace openshift-logging
 oc apply -f examples/dex.yaml
 ```
+
+Check openid-configuration and certificate at your DEX route URL:
+`https://dex-openshift-logging.apps.<MY_CLUSTER_URL>/dex/.well-known/openid-configuration`

@@ -67,3 +67,7 @@ oc apply -f examples/dex.yaml
 
 Check openid-configuration and certificate at your DEX route URL:
 `https://dex-openshift-logging.apps.<MY_CLUSTER_URL>/dex/.well-known/openid-configuration`
+
+You will now be able to login as dex users using the following credentials:
+- `admin@example.com`:`password` 
+- `foo@example.com`:`password`

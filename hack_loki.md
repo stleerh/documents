@@ -46,7 +46,7 @@ Check [Docs](https://github.com/ViaQ/loki-operator/tree/master/docs)
 ### Requirements
 - Install oc CLI for communicating with the cluster.
 - Running Openshift cluster
-- [Configured DEX](https://github.com/netobserv/documents/blob/main/hack_dex.md)
+- [Configured DEX](./hack_dex.md)
 - A container registry that you and your openshift cluster can reach.
 
 ### Setup
@@ -139,7 +139,7 @@ We recommand to use size: 1x.extra-small but this still require a lot of ressour
 You can decrese them in internal/manifests/internal/sizes.go and set `100m` for each CPUs and `256Mi` for each Memories
 
 - Certificate errors in Gateway logs
-Check [ZeroSSL.com CA with acme.sh](https://github.com/netobserv/documents/blob/main/hack_dex.md#zerosslcom-ca-with-acmesh)
+Check [ZeroSSL.com CA with acme.sh](./hack_dex.md#zerosslcom-ca-with-acmesh)
 
 ## Loki & Grafana stack with Helm
 
@@ -218,7 +218,8 @@ Open http://localhost:3000/ and login with `admin` + password according to previ
 Select "add datasource" => "Loki" and set your source :
 - `http://loki:3100` for helm
 - `http://loki-query-frontend-http-lokistack-dev.default.svc.cluster.local:3100` for loki-operator without gateway
-- `lokistack-gateway-http-lokistack-dev.openshift-logging.svc.cluster.local:8080/api/logs/v1/tenant-a` for loki-operator with gateway enabled using `tenant-a` endpoint
+- `lokistack-gateway-http-lokistack-dev.openshift-logging.svc.cluster.local:8080/api/logs/v1/tenant-a` for loki-operator with gateway enabled using `tenant-a` endpoint. 
+  Check `Forward Oauth Identity` option to send `X-Forwarded-User` according to [grafana.ini](./examples/grafana.ini)
 
 You should get "Data source connected and labels found." after clicking Save & Test button
 

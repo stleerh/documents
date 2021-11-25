@@ -46,11 +46,11 @@ Check [Docs](https://github.com/ViaQ/loki-operator/tree/master/docs)
 ### Requirements
 - Install oc CLI for communicating with the cluster.
 - Running Openshift cluster
-- [Configured DEX](https://github.com/netobserv/documents/blob/main/hack_dex.md)
+- [Configured DEX](./hack_dex.md)
 - A container registry that you and your openshift cluster can reach.
 
 ### Setup
-Since loki-operator is not already available on operator hub, you will need to build it from sources for now
+Since loki-operator is not already available on operator hub, you will need to build it from sources for now.
 
 Clone loki-operator repository and deploy
 ```bash
@@ -59,11 +59,23 @@ cd loki-operator
 make olm-deploy REGISTRY_ORG=$YOUR_QUAY_ORG VERSION=$VERSION
 ```
 
+[Create DEX instance](https://github.com/netobserv/documents/blob/main/hack_dex.md#create-dex-instance) in the `openshift-logging` namespace 
+
 Create aws bucket and secret. You can check [deploy-example-secret.sh](https://github.com/ViaQ/loki-operator/blob/master/hack/deploy-example-secret.sh) for infos.
 Example with us-east-1 region for netobserv-loki bucket:
 ```bash
 aws s3api create-bucket --bucket netobserv-loki --region us-east-1
-oc -n openshift-logging create secret generic test --from-literal=endpoint="https://s3.us-east-1.amazonaws.com" --from-literal=region="eu-east-1" --from-literal=bucketnames="netobserv-loki" --from-literal=access_key_id="XXXXXXXXXXXXXXXXXXXX" --from-literal=access_key_secret="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+oc -n openshift-logging create secret generic test --from-literal=endpoint="https://s3.us-east-1.amazonaws.com" --from-literal=region="us-east-1" --from-literal=bucketnames="netobserv-loki" --from-literal=access_key_id="XXXXXXXXXXXXXXXXXXXX" --from-literal=access_key_secret="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+```
+
+Remove `--with-cert-signing-service`, `--with-service-monitors` and `--with-tls-service-monitors` flags in `config/overlays/openshift/manager_run_flags_patch.yaml`. 
+Your container spec should look like this :
+```yaml
+      containers:
+        - name: manager
+          args:
+          - "--with-lokistack-gateway"
+          - "--with-lokistack-gateway-route"
 ```
 
 Create tenant secret with cliendID, clientSecret and ca according to your dex configuration:
@@ -102,12 +114,19 @@ Create gateway and gateway-status routes:
 oc -n openshift-logging apply -f examples/gateway_routes.yaml
 ```
 
-You check gateway status browsing:
-`https://gateway-status-openshift-logging.apps.<MY_CLUSTER_URL>`
+You can check `examples/gateway_routes.yaml` in this repository to create tenants and status routes for gateway:
+```bash
+oc apply -f examples/gateway_routes.yaml
+```
 
-Loki will now be exposed at:
-`http://gateway-openshift-logging.apps.<MY_CLUSTER_URL>/api/logs/v1/tenant-a/loki/`
-Check available routes in [api/logs/v1/http.go](https://github.com/observatorium/api/blob/main/api/logs/v1/http.go#L132)
+Gateway status will be available at:
+`http://gateway-status-openshift-logging.apps.<MY_CLUSTER_URL>`
+
+Loki will now be exposed at `api/logs/v1/tenant-a`. You can now open a private navigation and try the following url in your browser:
+`http://gateway-openshift-logging.apps.<MY_CLUSTER_URL>/api/logs/v1/tenant-a/loki/api/v1/labels`
+You will be redirected to DEX login before accessing this resource. It should return `status "success"`
+
+Check all available routes in [api/logs/v1/http.go](https://github.com/observatorium/api/blob/main/api/logs/v1/http.go#L132)
 
 ### Troubleshooting
 - AWS region not set for deploy-example-secret.sh
@@ -120,7 +139,7 @@ We recommand to use size: 1x.extra-small but this still require a lot of ressour
 You can decrese them in internal/manifests/internal/sizes.go and set `100m` for each CPUs and `256Mi` for each Memories
 
 - Certificate errors in Gateway logs
-Check [ZeroSSL.com CA with acme.sh](https://github.com/netobserv/documents/blob/main/hack_dex.md#-ZeroSSL.com-CA-with-acme.sh)
+Check [ZeroSSL.com CA with acme.sh](./hack_dex.md#zerosslcom-ca-with-acmesh)
 
 ## Loki & Grafana stack with Helm
 
@@ -199,7 +218,8 @@ Open http://localhost:3000/ and login with `admin` + password according to previ
 Select "add datasource" => "Loki" and set your source :
 - `http://loki:3100` for helm
 - `http://loki-query-frontend-http-lokistack-dev.default.svc.cluster.local:3100` for loki-operator without gateway
-- `lokistack-gateway-http-lokistack-dev.openshift-logging.svc.cluster.local:8080/api/logs/v1/tenant-a` for loki-operator with gateway enabled using `tenant-a` endpoint
+- `lokistack-gateway-http-lokistack-dev.openshift-logging.svc.cluster.local:8080/api/logs/v1/tenant-a` for loki-operator with gateway enabled using `tenant-a` endpoint. 
+  Check `Forward Oauth Identity` option to send `X-Forwarded-User` according to [grafana.ini](./examples/grafana.ini)
 
 You should get "Data source connected and labels found." after clicking Save & Test button
 

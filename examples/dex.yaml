@@ -131,11 +131,14 @@ data:
     - id: grafana
       name: grafana
       redirectURIs:
+      - 'http://grafana.default.svc.cluster.local/login/generic_oauth'
       - 'http://grafana-default.apps.<MY_CLUSTER_URL>/login/generic_oauth'
       secret: password
     - id: tenant-a
       name: tenant-a
       redirectURIs:
+      - 'http://localhost:8080/oidc/tenant-a/callback'
+      - 'https://lokistack-gateway-http-lokistack-dev.openshift-logging.svc.cluster.local:8080/oidc/tenant-a/callback'
       - 'http://gateway-openshift-logging.apps.<MY_CLUSTER_URL>/oidc/tenant-a/callback'
       secret: password
     enablePasswordDB: true

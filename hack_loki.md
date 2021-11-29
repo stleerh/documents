@@ -114,11 +114,6 @@ Create gateway and gateway-status routes:
 oc -n openshift-logging apply -f examples/gateway_routes.yaml
 ```
 
-You can check `examples/gateway_routes.yaml` in this repository to create tenants and status routes for gateway:
-```bash
-oc apply -f examples/gateway_routes.yaml
-```
-
 Gateway status will be available at:
 `http://gateway-status-openshift-logging.apps.<MY_CLUSTER_URL>`
 
@@ -185,6 +180,10 @@ Wait for the service running then forward port
 ```bash
 kubectl port-forward service/grafana 3000:3000
 ```
+
+OR 
+
+Use route at `http://grafana-default.apps.<MY_CLUSTER_URL>`
 
 Login : `admin`
 Password : `admin`

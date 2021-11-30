@@ -68,7 +68,7 @@ aws s3api create-bucket --bucket netobserv-loki --region us-east-1
 oc -n openshift-logging create secret generic test --from-literal=endpoint="https://s3.us-east-1.amazonaws.com" --from-literal=region="us-east-1" --from-literal=bucketnames="netobserv-loki" --from-literal=access_key_id="XXXXXXXXXXXXXXXXXXXX" --from-literal=access_key_secret="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ```
 
-Remove `--with-cert-signing-service`, `--with-service-monitors` and `--with-tls-service-monitors` flags in `config/overlays/openshift/manager_run_flags_patch.yaml`. 
+If you want to use internal HTTP urls, remove `--with-cert-signing-service`, `--with-service-monitors` and `--with-tls-service-monitors` flags in `config/overlays/openshift/manager_run_flags_patch.yaml`. 
 Your container spec should look like this :
 ```yaml
       containers:
@@ -77,6 +77,7 @@ Your container spec should look like this :
           - "--with-lokistack-gateway"
           - "--with-lokistack-gateway-route"
 ```
+Else you will have to create reencrypt routes to access services.
 
 Create tenant secret with cliendID, clientSecret and ca according to your dex configuration:
 ```bash
@@ -124,6 +125,9 @@ You will be redirected to DEX login before accessing this resource. It should re
 Check all available routes in [api/logs/v1/http.go](https://github.com/observatorium/api/blob/main/api/logs/v1/http.go#L132)
 
 ### Troubleshooting
+- Logs are by default `--log.level=warn`. 
+You can set `--log.level=debug` in `gateway.go` and `opa_openshift.go` to get more logs.
+
 - AWS region not set for deploy-example-secret.sh
 If `aws configure get region` returns blank, the shell will fail. 
 You can force region using `aws configure --region us-east-1` for example.

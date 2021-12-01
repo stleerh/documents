@@ -226,12 +226,12 @@ Select "add datasource" => "Loki" and set your source :
 
 You should get "Data source connected and labels found." after clicking Save & Test button
 
-Example of queries:
+Example of queries for `netobserv-flowcollector` app:
 - View raw logs:
-`{app="goflow2"}`
+`{app="netobserv-flowcollector"}`
 
 - Top 10 sources by volumetry (1 min-rate):
-`topk(10, (sum by(SrcWorkload,SrcNamespace) ( rate({ app="goflow2" } | json | __error__="" | unwrap Bytes [1m]) )))`
+`topk(10, (sum by(SrcWorkload,SrcNamespace) ( rate({ app="netobserv-flowcollector" } | json | __error__="" | unwrap Bytes [1m]) )))`
 
 - Top 10 destinations for a given source (1 min-rate):
-`topk(10, (sum by(DstWorkload,DstNamespace) ( rate({ app="goflow2",SrcNamespace="default",SrcWorkload="goflow" } | json | __error__="" | unwrap Bytes [1m]) )))`
+`topk(10, (sum by(DstWorkload,DstNamespace) ( rate({ app="netobserv-flowcollector",SrcNamespace="default",SrcWorkload="goflow" } | json | __error__="" | unwrap Bytes [1m]) )))`

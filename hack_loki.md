@@ -2,6 +2,22 @@
 This file will help you using [loki-operator](https://github.com/ViaQ/loki-operator) since it's still WIP project.
 You can check [this PR](https://github.com/ViaQ/loki-operator/pull/99) for dev usage and the [README.md](https://github.com/ViaQ/loki-operator/blob/master/README.md) file for status
 
+## Fake Loki frontend
+If you only need basic http endpoints with fake datas from [grafana examples](https://grafana.com/docs/loki/latest/api/#grafana-loki-http-api), you can create a fake server using [json-server](https://github.com/typicode/json-server).
+
+Install json-server globally:
+```bash
+sudo npm install -g json-server
+```
+
+Run the server on `http://localhost:3100`:
+```bash
+json-server --watch ./examples/loki_api_examples.json --routes ./examples/routes.json --port 3100 --delay 100
+```
+
+This will expose routes from [routes.json](./examples/routes.json) with [loki_api_examples.json](./examples/loki_api_examples.json) datas. 
+You can also use [loki_api_custom.json](./examples/loki_api_custom.json) instead for OpenShift real sample datas.
+
 ## Loki Operator without gateway
 Loki operator can be run without gateway for debug on kind or Openshift. It will create the same ressources as helm lokistack installation:
 `distributor`, `compactor`, `ingester`, `querier`, `query-frontend`

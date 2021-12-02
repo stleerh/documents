@@ -1,0 +1,14 @@
+{
+    "/loki/api/v1/query": "/query",
+    "/loki/api/v1/query_range?query={app=\"netobserv-flowcollector\"}": "/query_range",
+    "/loki/api/v1/labels": "/labels",
+    "/loki/api/v1/label/foo/values": "/labelsFooValues",
+    "/loki/api/v1/label/DstNamespace/values": "/labelsDstNamespaceValues",
+    "/loki/api/v1/label/DstWorkload/values": "/labelsDstWorkloadValues",
+    "/loki/api/v1/label/SrcNamespace/values": "/labelsSrcNamespaceValues",
+    "/loki/api/v1/label/SrcWorkload/values": "/labelsSrcWorkloadValues",
+    "/loki/api/v1/label/__name__/values": "/labelsNameValues",
+    "/loki/api/v1/label/app/values": "/labelsAppValues",
+    "/loki/api/v1/series": "series",
+    "/loki/api/v1/status/buildinfo": "buildinfo"
+}

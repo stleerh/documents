@@ -13,6 +13,8 @@ This repo contains various documents related to this "netobserv" initiative.
         A Loki exporter plugin
     * [network-observability-console-plugin](https://github.com/netobserv/network-observability-console-plugin)
     Network Observability plugin for the Openshift Console
+    * [nflow-generator](https://github.com/netobserv/nflow-generator)
+    A fake legacy v5 netflow generator
 
 ### Get started
 The easiest way to get started is to use the [Network Observability Operator](https://github.com/netobserv/network-observability-operator) that will deploy all the components for you.

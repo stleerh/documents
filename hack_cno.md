@@ -1,4 +1,4 @@
-# Deploy development version of the CNO and OVS-Kubernetes
+# Deploy development version of the CNO and OVN-Kubernetes
 
 ## Using pre-built images (at quay.io/mmacias)
 

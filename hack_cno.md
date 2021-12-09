@@ -27,7 +27,7 @@ You need to patch the [manifests/0000_70_cluster-network-operator_03_deployment.
 
 Simply run the following command to update it:
 ```bash
-oc apply -f examples/network_operator_deployment.yaml
+oc apply -f manifests/0000_70_cluster-network-operator_03_deployment.yaml 
 ```
 
 Check image and events:

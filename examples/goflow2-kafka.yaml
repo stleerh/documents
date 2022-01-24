@@ -23,7 +23,7 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - /goflow2 -loglevel=trace -listen=netflow://:2055 -transport=kafka -transport.kafka.brokers=my-cluster-kafka-brokers.openshift-operators.svc.cluster.local:9092 -transport.kafka.topic=goflow-kube -transport.kafka.hashing=true -format.hash=TimeReceived,SamplerAddress,SrcAddr,SrcPort,SrcMac,DstAddress,DstPort,DstMac
+            - /goflow2 -loglevel=trace -listen=netflow://:2055 -transport=kafka -transport.kafka.brokers=my-cluster-kafka-brokers.default.svc.cluster.local:9092 -transport.kafka.topic=goflow-kube -transport.kafka.hashing=true -format.hash=TimeReceived,SamplerAddress,SrcAddr,SrcPort,SrcMac,DstAddress,DstPort,DstMac
           image: quay.io/netobserv/goflow2:main
           imagePullPolicy: IfNotPresent
           name: goflow2

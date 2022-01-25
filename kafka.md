@@ -16,6 +16,22 @@ Edit brokers parameter according to your needs and run:
 oc apply -f examples/goflow-kube-kafka-exporter.yaml
 ```
 
+You can set fields used for partition hash by setting `hashKeys`:
+```yaml
+  config.yaml: |
+    ...
+    kafka:
+      version: 3.0.0
+      export:
+        hashKeys:
+          - TimeReceived
+          - SrcAddr
+          - SrcMac
+          - DstAddr
+          - DstMac
+```
+Else it will choose partition randomly.
+
 By default the following options will be used:
 ```go
 Version: "2.8.0",
@@ -23,7 +39,7 @@ TLS:     false,
 SASL:    nil,
 Topic:   "goflow-kube",
 ...
-Hashing:        false,
+Keys:           []string{},
 Brokers:        []string{},
 MaxMsgBytes:    1024 * 1024,      // 1mb
 FlushBytes:     10 * 1024 * 1024, // 10 mb

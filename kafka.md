@@ -1,12 +1,38 @@
 # Deploy Kafka on Openshift using Strimzi Operator
 
 The easiest way to deploy Kafka on Openshift is using [Strimzi](https://strimzi.io/).
-An Operator is available in OperatorHub section. Simply install it and create a "Kafka" instance.
+An Operator is available in OperatorHub section. 
+Simply install it and create a "Kafka" instance in `default` namespace.
 
-The default settings will create a bunch of Kafka Brokers and Zookeepers in `default` namespace.
+# Deploy a Kafka Producer
 
-# Deploy goflow2 as Kafka Producer
+You can either deploy `goflow2` or `kube-enricher` as Kafka producers. The main difference is that `kube-enricher` allows you to add kubernetes datas from flows. Check [README.md](https://github.com/netobserv/goflow2-kube-enricher/blob/main/README.md) for more details.
 
+## kube-enricher
+Check [goflow-kube-kafka-exporter.yaml](https://github.com/netobserv/goflow2-kube-enricher/blob/main/examples/goflow-kube-kafka-exporter.yaml) from `oflow2-kube-enricher` repository in `goflow2-kube-enricher/examples/` folder.
+
+Edit brokers parameter according to your needs and run:
+```bash
+oc apply -f examples/goflow-kube-kafka-exporter.yaml
+```
+
+By default the following options will be used:
+```go
+Version: "2.8.0",
+TLS:     false,
+SASL:    nil,
+Topic:   "goflow-kube",
+...
+Hashing:        false,
+Brokers:        []string{},
+MaxMsgBytes:    1024 * 1024,      // 1mb
+FlushBytes:     10 * 1024 * 1024, // 10 mb
+FlushFrequency: 5 * time.Second,
+```
+
+Check [config.go](https://github.com/netobserv/goflow2-kube-enricher/blob/main/pkg/config/config.go) for more details
+
+## goflow2 
 Take a look at file [goflow2-karka.yaml](./examples/goflow2-kafka.yaml)
 
 Edit command arguments according to your needs:
@@ -19,7 +45,7 @@ Edit command arguments according to your needs:
 `-format.hash=TimeReceived,SamplerAddress,SrcAddr,SrcPort,SrcMac,DstAddress,DstPort,DstMac` fields used for partition hash
 
 Then deploy goflow2:
-```
+```bash
 oc apply -f examples/goflow2-kafka.yaml
 ```
 
@@ -55,9 +81,9 @@ spec:
   topicName: goflow-kube
 ```
 
-# Deploy kube-enricher as Kafka Consumer
+# Deploy a Kafka Consumer
 
-Check [goflow-kube-kafka.yaml](https://github.com/netobserv/goflow2-kube-enricher/blob/main/examples/goflow-kube-legacy.yaml) in `goflow2-kube-enricher/examples/`
+Check [goflow-kube-kafka-consumer.yaml](https://github.com/netobserv/goflow2-kube-enricher/blob/main/examples/goflow-kube-kafka-consumer.yaml) from `oflow2-kube-enricher` repository in `goflow2-kube-enricher/examples/` folder.
 
 You will need to specify kafka broker url and port in the `listen` config option and optionally `version` in `kafka` section. 
 ```yaml
@@ -75,12 +101,17 @@ data:
 
 By default the following options will be used:
 ```go
+Version: "2.8.0",
+TLS:     false,
+SASL:    nil,
+Topic:   "goflow-kube",
+...
 Group:               "goflow-kube",
 BalanceStrategy:     "range",
 InitialOffsetOldest: true,
-Version:             "2.8.0",
-TLS:                 false,
-Topic:               "goflow-kube",
+Backoff:             2 * time.Second,
+MaxWaitTime:         5 * time.Second,
+MaxProcessingTime:   1 * time.Second,
 ```
 
 Check [config.go](https://github.com/netobserv/goflow2-kube-enricher/blob/main/pkg/config/config.go) for more details
@@ -98,7 +129,7 @@ helm upgrade --install -f examples/kowl.yaml kowl cloudhut/kowl
 You should get a prompt showing status `deployed`
 
 Then run:
-```
+```bash
 export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=kowl,app.kubernetes.io/instance=kowl" -o jsonpath="{.items[0].metadata.name}")
 kubectl --namespace default port-forward $POD_NAME 8080:8080
 ```

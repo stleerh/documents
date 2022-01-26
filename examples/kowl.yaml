@@ -1,0 +1,23 @@
+# may be needed if security contraints of k8s cluster expect a custom user range 
+podSecurityContext: {runAsUser: 1001190000, fsGroup: 1001190000}
+
+# configuration of kowl
+kowl:
+  # See reference config: https://github.com/cloudhut/kowl/blob/master/docs/config/kowl.yaml)
+  config:
+    kafka:
+      brokers:
+        # Set your bootstrap url. Kowl does domain name validation so be sure to pick a valid url which is covered in the subject alternative name of the certificate of the bootsrap endpoint (e.g. no <namespace>.svc.cluster.local address).
+        -  my-cluster-kafka-bootstrap:9093
+      tls:
+        enabled: true
+        caFilepath: /etc/strimzi/ca/ca.crt
+extraVolumeMounts: |-
+  - name: strimzi-ca
+    mountPath: /etc/strimzi/ca
+    readOnly: true
+extraVolumes: |-
+  - name: strimzi-ca
+    secret:
+      # you need to prefix this secret name with the name of you cluster
+      secretName: my-cluster-cluster-ca-cert

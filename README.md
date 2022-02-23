@@ -1,5 +1,5 @@
 ## Documents
-This repo contains various documents related to this "netobserv" initiative.
+This repo contains various documents related to network observability (a.k.a. netobserv):
 
 ### Repositories
 * [network-observability-operator](https://github.com/netobserv/network-observability-operator)
@@ -23,6 +23,9 @@ You can either:
 - [Deploy an existing image](https://github.com/netobserv/network-observability-operator#deploy-an-existing-image)
 - [Build from sources](https://github.com/netobserv/network-observability-operator#build--push--deploy)
 
-You will need [Kind](./kind.md) or [OpenShift](./openshift.md) with ovn-kubernetes configured to get network flows.
+### Development
 
-If you don't need the entire stack, you can just [check components](###repositories) above.
+You will need [Kind](./kind.md) or [OpenShift](./openshift.md) with ovn-kubernetes configured to get network flows.
+For quick development on OCP use [this guide](./noo_dev_ocp.md)
+
+If you don't need the entire stack, you can just [check components](#repositories) above.

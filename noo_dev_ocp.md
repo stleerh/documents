@@ -13,7 +13,7 @@ The following instructions are useful for local speedy development of the operat
 2. execute `kubectl create namespace network-observability` - this creates the `network-observability` namespace
 3. execute `kubectl config set-context --current --namespace network-observability` - this changes the `kubectl` context to `network-observability` namespace
 4. Execute `make deploy-loki` - this  deploys a simple loki instance into the cluster
-5. Execute `make deploy-grafana ` - this deploys a simple grafana instance into the cluster (user: admin password: admin)
+5. Execute `make deploy-grafana` - this deploys a simple grafana instance into the cluster (user: admin password: admin)
 6. Execute `oc patch console.operator.openshift.io cluster --type='json' -p '[{"op": "add", "path": "/spec/plugins", "value": ["network-observability-plugin"]}]'` - this enables the console plugin
    - note: the console plug-in itself is deployed as part of `make run` by the operator. This patch can be applied also post deployment of the console plug-in   
 7. Execute `make install` - this installs the operator CRDs into the cluster
@@ -23,7 +23,7 @@ The following instructions are useful for local speedy development of the operat
 11. Once the `goflow-kube` pod is ready, on OCP 4.9 and earlier, enable IPFIX collection into `goflow-kube` using:
 ```bash
 GF_IP=`oc get svc goflow-kube -n network-observability -ojsonpath='{.spec.clusterIP}'` && echo $GF_IP
-oc patch networks.operator.openshift.io cluster --type='json' -p "$(sed -e "s/GF_IP/$GF_IP/" ./config/samples/net-cluster-patch.json)"
+oc patch network.operator cluster --type='json' --patch='[{"op": "add","path": "/spec","value": {"exportNetworkFlows": {"ipfix": { "collectors": ["'"$GF_IP"':2055"]}}}}]'
 ``` 
 
 ## Notes

@@ -1,8 +1,40 @@
 # Deploy Kafka on Openshift using Strimzi Operator
 
 The easiest way to deploy Kafka on Openshift is using [Strimzi](https://strimzi.io/).
-An Operator is available in OperatorHub section. 
+An Operator is available in OperatorHub section.
 Simply install it and create a "Kafka" instance in `default` namespace.
+
+## Manual installation of strimzi operator
+
+You can use the following command to deploy the strimzi operator :
+
+```
+export NAMESPACE=network-observability
+kubectl create -f "https://strimzi.io/install/latest?namespace=$NAMESPACE" -n $NAMESPACE
+```
+
+## Creating the cluster
+
+An example of kafka-cluster.yaml file can be found [here](./examples/kafka-cluster.yaml).
+
+```
+kubectl apply -f ./examples/kafka-cluster.yaml -n $NAMESPACE
+```
+
+## Creating a topic
+
+Topics can be managed with through the strimzi operator. An example of kafka-topic.yaml can be found [here](./examples/kafka-topic.yaml)
+
+```
+kubectl apply -f ./examples/kafka-topic.yaml -n $NAMESPACE
+```
+
+## Deleting the topic and the cluster
+
+```
+kubectl delete -f ./examples/kafka-cluster.yaml -n $NAMESPACE
+kubectl delete -f ./examples/kafka-topic.yaml -n $NAMESPACE
+```
 
 # Deploy a Kafka Producer
 

@@ -21,6 +21,8 @@ An example of kafka-cluster.yaml file can be found [here](./examples/kafka-clust
 kubectl apply -f ./examples/kafka-cluster.yaml -n $NAMESPACE
 ```
 
+Note that prometheus is enabled, however user workload needs to be enabled in the openshift cluster for the metrics to be collected.
+
 ## Creating a topic
 
 Topics can be managed with through the strimzi operator. An example of kafka-topic.yaml can be found [here](./examples/kafka-topic.yaml)

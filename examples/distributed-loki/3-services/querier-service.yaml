@@ -1,0 +1,62 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: loki-distributed-querier
+  labels:
+    app.kubernetes.io/component: querier
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/version: 2.5.0
+spec:
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3100
+      targetPort: http
+    - name: grpc
+      protocol: TCP
+      port: 9095
+      targetPort: grpc
+  internalTrafficPolicy: Cluster
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app.kubernetes.io/component: querier
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki-distributed
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: loki-distributed-querier-headless
+  labels:
+    app.kubernetes.io/component: querier
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki-distributed
+    prometheus.io/service-monitor: 'false'
+spec:
+  clusterIP: None
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3100
+      targetPort: http
+    - name: grpc
+      protocol: TCP
+      port: 9095
+      targetPort: grpc
+  internalTrafficPolicy: Cluster
+  clusterIPs:
+    - None
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app.kubernetes.io/component: querier
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki-distributed

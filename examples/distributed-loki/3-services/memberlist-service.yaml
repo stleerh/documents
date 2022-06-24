@@ -1,0 +1,27 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: loki-distributed-memberlist
+  labels:
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/version: 2.5.0
+spec:
+  clusterIP: None
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: http
+      protocol: TCP
+      port: 7946
+      targetPort: http-memberlist
+  internalTrafficPolicy: Cluster
+  clusterIPs:
+    - None
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/part-of: memberlist

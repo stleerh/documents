@@ -1,0 +1,122 @@
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: loki-distributed-ingester
+  labels:
+    app.kubernetes.io/component: ingester
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/part-of: memberlist
+    app.kubernetes.io/version: 2.5.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: ingester
+      app.kubernetes.io/instance: loki
+      app.kubernetes.io/name: loki-distributed
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: ingester
+        app.kubernetes.io/instance: loki
+        app.kubernetes.io/name: loki-distributed
+        app.kubernetes.io/part-of: memberlist
+    spec:
+      restartPolicy: Always
+      serviceAccountName: loki-distributed
+      schedulerName: default-scheduler
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: ingester
+                  app.kubernetes.io/instance: loki
+                  app.kubernetes.io/name: loki-distributed
+              topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/component: ingester
+                    app.kubernetes.io/instance: loki
+                    app.kubernetes.io/name: loki-distributed
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+      terminationGracePeriodSeconds: 300
+      containers:
+        - resources: {}
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          name: ingester
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          ports:
+            - name: http
+              containerPort: 3100
+              protocol: TCP
+            - name: grpc
+              containerPort: 9095
+              protocol: TCP
+            - name: http-memberlist
+              containerPort: 7946
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: config
+              mountPath: /etc/loki/config
+            - name: loki-store
+              mountPath: /loki-store
+          terminationMessagePolicy: File
+          image: 'grafana/loki:2.5.0'
+          args:
+            - '-config.file=/etc/loki/config/config.yaml'
+            - '-target=ingester'
+      serviceAccount: loki-distributed
+      volumes:
+        - name: config
+          configMap:
+            name: loki-distributed
+            defaultMode: 420
+      dnsPolicy: ClusterFirst
+  volumeClaimTemplates:
+    - kind: PersistentVolumeClaim
+      apiVersion: v1
+      metadata:
+        name: loki-store
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/component: ingester
+          app.kubernetes.io/created-by: loki-distributed-ingester
+          app.kubernetes.io/instance: loki
+          app.kubernetes.io/name: loki-distributed
+          app.kubernetes.io/version: 2.5.0
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+        volumeMode: Filesystem
+  serviceName: loki-distributed-ingester-headless
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  revisionHistoryLimit: 10

@@ -1,0 +1,101 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: loki-distributed-distributor
+  labels:
+    app.kubernetes.io/component: distributor
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/part-of: memberlist
+    app.kubernetes.io/version: 2.5.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: distributor
+      app.kubernetes.io/instance: loki
+      app.kubernetes.io/name: loki-distributed
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: distributor
+        app.kubernetes.io/instance: loki
+        app.kubernetes.io/name: loki-distributed
+        app.kubernetes.io/part-of: memberlist
+    spec:
+      restartPolicy: Always
+      serviceAccountName: loki-distributed
+      schedulerName: default-scheduler
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: distributor
+                  app.kubernetes.io/instance: loki
+                  app.kubernetes.io/name: loki-distributed
+              topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/component: distributor
+                    app.kubernetes.io/instance: loki
+                    app.kubernetes.io/name: loki-distributed
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+      terminationGracePeriodSeconds: 30
+      containers:
+        - resources: {}
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          name: distributor
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          ports:
+            - name: http
+              containerPort: 3100
+              protocol: TCP
+            - name: grpc
+              containerPort: 9095
+              protocol: TCP
+            - name: http-memberlist
+              containerPort: 7946
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: config
+              mountPath: /etc/loki/config
+          terminationMessagePolicy: File
+          image: 'grafana/loki:2.5.0'
+          args:
+            - '-config.file=/etc/loki/config/config.yaml'
+            - '-target=distributor'
+      serviceAccount: loki-distributed
+      volumes:
+        - name: config
+          configMap:
+            name: loki-distributed
+            defaultMode: 420
+      dnsPolicy: ClusterFirst
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

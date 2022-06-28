@@ -1,35 +1,53 @@
-apiVersion: v1
 kind: ConfigMap
+apiVersion: v1
 metadata:
-  name: loki-config
+  name: loki-distributed
+  labels:
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/version: 2.5.0
 data:
-  local-config.yaml: |
+  config.yaml: |
     auth_enabled: false
+    common:
+      storage:
+        $(LOKI_STORE)
     server:
       http_listen_port: 3100
-      grpc_listen_port: 9096
       http_server_read_timeout: 1m
       http_server_write_timeout: 1m
       log_level: error
-    target: all
-    common:
-      path_prefix: /loki-store
-      storage:
-        filesystem:
-          chunks_directory: /loki-store/chunks
-          rules_directory: /loki-store/rules
-      replication_factor: 1
-      ring:
-        instance_addr: 127.0.0.1
-        kvstore:
-          store: inmemory
+    chunk_store_config:
+      max_look_back_period: 0s
     compactor:
       compaction_interval: 5m
+      shared_store: filesystem
+    distributor:
+      ring:
+        kvstore:
+          store: memberlist
     frontend:
       compress_responses: true
+      log_queries_longer_than: 5s
+      tail_proxy_url: http://loki-distributed-querier:3100
+    frontend_worker:
+      frontend_address: loki-distributed-query-frontend:9095
     ingester:
+      chunk_block_size: 262144
       chunk_encoding: snappy
+      chunk_idle_period: 30m
       chunk_retain_period: 1m
+      lifecycler:
+        ring:
+          kvstore:
+            store: memberlist
+          replication_factor: 1
+      max_transfer_retries: 0
+      wal:
+        dir: /loki-store/wal
+    memberlist:
+      join_members:
+      - loki-distributed-memberlist
     query_range:
       align_queries_with_step: true
       cache_results: true
@@ -40,24 +58,37 @@ data:
           fifocache:
             max_size_bytes: 500MB
             validity: 24h
-      parallelise_shardable_queries: true
+    ruler:
+      alertmanager_url: https://alertmanager.xx
+      external_url: https://alertmanager.xx
+      ring:
+        kvstore:
+          store: memberlist
+      rule_path: /tmp/loki/scratch
+      storage:
+        local:
+          directory: /etc/loki/rules
+        type: local
     schema_config:
       configs:
         - from: 2022-01-01
           store: boltdb-shipper
-          object_store: filesystem
+          object_store: $(LOKI_STORE_NAME)
           schema: v11
           index:
             prefix: index_
             period: 24h
     storage_config:
       filesystem:
-        directory: /loki-store/storage
+        directory: /loki-store/chunks
       boltdb_shipper:
         active_index_directory: /loki-store/index
         shared_store: filesystem
-        cache_location: /loki-store/boltdb-cache
+        cache_location: /loki-store/cache
         cache_ttl: 24h
+    table_manager:
+      retention_deletes_enabled: false
+      retention_period: 0s
     limits_config:    
       ingestion_rate_strategy: global 
       ingestion_rate_mb: 4
@@ -90,41 +121,3 @@ data:
       max_query_lookback: 0
       min_sharding_lookback: 0s
       split_queries_by_interval: 1m
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: loki
-  labels:
-    app: loki
-spec:
-  securityContext:
-    runAsGroup: 1000
-    runAsUser: 1000
-    fsGroup: 1000
-  volumes:
-    - name: loki-store
-      persistentVolumeClaim:
-        claimName: loki-store
-    - name: loki-config
-      configMap:
-        name: loki-config
-  containers:
-    - name: loki
-      image: grafana/loki:2.5.0
-      volumeMounts:
-        - mountPath: "/loki-store"
-          name: loki-store
-        - mountPath: "/etc/loki"
-          name: loki-config
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: loki
-spec:
-  selector:
-    app: loki
-  ports:
-    - port: 3100
-      protocol: TCP

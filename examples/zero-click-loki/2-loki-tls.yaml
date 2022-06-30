@@ -7,6 +7,9 @@ data:
     auth_enabled: false
     server:
       http_listen_port: 3100
+      http_tls_config: &tls_server_config
+        cert_file: /var/serving-cert/tls.crt
+        key_file:  /var/serving-cert/tls.key
       grpc_listen_port: 9096
       http_server_read_timeout: 1m
       http_server_write_timeout: 1m
@@ -109,6 +112,9 @@ spec:
     - name: loki-config
       configMap:
         name: loki-config
+    - name: certs
+      secret:
+        secretName: loki
   containers:
     - name: loki
       image: grafana/loki:2.5.0
@@ -117,11 +123,16 @@ spec:
           name: loki-store
         - mountPath: "/etc/loki"
           name: loki-config
+        - mountPath: "/var/serving-cert"
+          name: certs
+          readOnly: true
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: loki
+  annotations:
+    service.alpha.openshift.io/serving-cert-secret-name: loki
 spec:
   selector:
     app: loki

@@ -84,7 +84,19 @@ spec:
           image: 'grafana/loki:2.5.0'
           args:
             - '-config.file=/etc/loki/config/config.yaml'
+            - '-config.expand-env=true'
             - '-target=distributor'
+          env:
+            - name: ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef: 
+                  name: loki-distributed
+                  key: ACCESS_KEY_ID
+            - name: SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef: 
+                  name: loki-distributed
+                  key: SECRET_ACCESS_KEY
       serviceAccount: loki-distributed
       volumes:
         - name: config

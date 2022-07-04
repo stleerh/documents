@@ -38,9 +38,11 @@ Note that `querier` and `ingester` has alternative services with `-headless` suf
 An additionnal service called `loki-distributed-memberlist` will match all the components and allow discoverability between them.
 
 ## Storage configuration
+Edit [loki Secret](./examples/distributed-loki/1-prerequisites/secret.yaml) and replace `ACCESS_KEY_ID` and `SECRET_ACCESS_KEY` values with your bucket credentials. These will be loaded in environment variables and can be reused in config as `${ACCESS_KEY_ID}` and `${SECRET_ACCESS_KEY}`.
+
 Edit [loki ConfigMap](./examples/distributed-loki/1-prerequisites/config.yaml) and replace `$(LOKI_STORE_NAME)` and `$(LOKI_STORE)` with your proper external storage configuration.
 
-Example using `s3` bucket called `loki` in `us-east-1` region:
+Example using `s3` bucket called `loki` in `us-east-1` region with credentials from secret:
 ```yaml
   config.yaml: |
     ...
@@ -50,8 +52,8 @@ Example using `s3` bucket called `loki` in `us-east-1` region:
           s3: https://s3.us-east-1.amazonaws.com
           bucketnames: loki
           region: us-east-1
-          access_key_id: XXXXXXXXXXXXXXXXXXXX
-          secret_access_key: YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+          access_key_id: ${ACCESS_KEY_ID}
+          secret_access_key: ${SECRET_ACCESS_KEY}
           s3forcepathstyle: true
     ...
     schema_config:

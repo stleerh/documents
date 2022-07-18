@@ -38,15 +38,15 @@ spec:
     replicas: 1
     storage:
       type: ephemeral
+    metricsConfig:
+      type: jmxPrometheusExporter
+      valueFrom:
+        configMapKeyRef:
+          name: kafka-metrics
+          key: zookeeper-metrics-config.yml
   entityOperator:
     topicOperator: {}
     userOperator: {}
-  metricsConfig:
-    type: jmxPrometheusExporter
-    valueFrom:
-      configMapKeyRef:
-        name: kafka-metrics
-        key: zookeeper-metrics-config.yml
 ---
 kind: ConfigMap
 apiVersion: v1

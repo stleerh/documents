@@ -1,53 +1,3 @@
-apiVersion: kafka.strimzi.io/v1beta2
-kind: Kafka
-metadata:
-  name: kafka-cluster
-spec:
-  kafka:
-    version: 3.1.0
-    replicas: 1
-    listeners:
-      - name: tls
-        port: 9092
-        type: internal
-        tls: true
-        authentication:
-          type: tls
-      - name: external
-        port: 9094
-        type: nodeport
-        tls: true
-        authentication:
-          type: tls
-    config:
-      offsets.topic.replication.factor: 1
-      transaction.state.log.replication.factor: 1
-      transaction.state.log.min.isr: 1
-      default.replication.factor: 1
-      min.insync.replicas: 1
-      inter.broker.protocol.version: "3.1"
-    storage:
-      type: ephemeral
-    metricsConfig:
-      type: jmxPrometheusExporter
-      valueFrom:
-        configMapKeyRef:
-          name: kafka-metrics
-          key: kafka-metrics-config.yml
-  zookeeper:
-    replicas: 1
-    storage:
-      type: ephemeral
-    metricsConfig:
-      type: jmxPrometheusExporter
-      valueFrom:
-        configMapKeyRef:
-          name: kafka-metrics
-          key: zookeeper-metrics-config.yml
-  entityOperator:
-    topicOperator: {}
-    userOperator: {}
----
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -210,7 +160,6 @@ data:
       labels:
         replicaId: "$2"
         memberType: "$3"
----
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor

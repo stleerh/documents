@@ -90,8 +90,7 @@ You should get a prompt showing status `deployed`
 
 Then run:
 ```bash
-export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=kowl,app.kubernetes.io/instance=kowl" -o jsonpath="{.items[0].metadata.name}")
-kubectl --namespace default port-forward $POD_NAME 8080:8080
+kubectl port-forward svc/kowl 8080:80
 ```
 
 Open `http://127.0.0.1:8080` to access kowl.

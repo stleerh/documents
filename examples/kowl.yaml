@@ -1,5 +1,5 @@
 # may be needed if security contraints of k8s cluster expect a custom user range 
-podSecurityContext: {runAsUser: 1001190000, fsGroup: 1001190000}
+podSecurityContext: {runAsUser: 1000660000, fsGroup: 1000660000}
 
 # configuration of kowl
 kowl:
@@ -8,16 +8,25 @@ kowl:
     kafka:
       brokers:
         # Set your bootstrap url. Kowl does domain name validation so be sure to pick a valid url which is covered in the subject alternative name of the certificate of the bootsrap endpoint (e.g. no <namespace>.svc.cluster.local address).
-        -  my-cluster-kafka-bootstrap:9093
+        -  kafka-cluster-kafka-bootstrap.network-observability
       tls:
         enabled: true
         caFilepath: /etc/strimzi/ca/ca.crt
+        certFilepath: /etc/strimzi/user/user.crt
+        keyFilepath: /etc/strimzi/user/user.key
 extraVolumeMounts: |-
   - name: strimzi-ca
     mountPath: /etc/strimzi/ca
+    readOnly: true
+  - name: strimzi-user
+    mountPath: /etc/strimzi/user
     readOnly: true
 extraVolumes: |-
   - name: strimzi-ca
     secret:
       # you need to prefix this secret name with the name of you cluster
-      secretName: my-cluster-cluster-ca-cert
+      secretName: kafka-cluster-cluster-ca-cert
+  - name: strimzi-user
+    secret:
+      # you need to reference the name of a existing KafkaUser resource
+      secretName: kowl-kafka

@@ -28,3 +28,6 @@ subjects:
 - kind: ServiceAccount
   name: flowlogs-pipeline
   namespace: network-observability
+- kind: ServiceAccount
+  name: network-observability-plugin
+  namespace: network-observability

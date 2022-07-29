@@ -1,4 +1,4 @@
-## Openshift
+# Openshift
 
 * [Deploy using OpenShift Container Platform](#deploy-using-openshift-container-platform)
 * [Deploy using Cluster Bot](#deploy-using-cluster-bot)
@@ -80,5 +80,20 @@ Console by the Pull Request `#9953`:
 launch 4.10-ci,openshift/console#9953
 ```
 
+## Metrics
 
+NetObserv comes with a bunch of metrics, however they are not scraped by default by OpenShift Cluster Monitoring (the OpenShift cluster Prometheus that is used for infra monitoring).
 
+You can install your own Prometheus to scrape NetObserv's metrics.
+
+As an alternative, you can also tell OpenShift Cluster Monitoring to scrape all user metrics, not just infra (provided as "USE AT YOUR OWN RISK": depending on your running workloads and their metrics, it may put pressure on Prometheus and make it unstable).
+
+We provide some YAML to do so:
+
+```bash
+oc apply -f https://raw.githubusercontent.com/netobserv/documents/main/examples/metrics/monitoring.yaml
+```
+
+It will create a `Service` for flowlogs-pipeline metrics, two `ServiceMonitors` (for flowlogs-pipeline and the console plugin), and configure Cluster Monitoring to scrape user metrics.
+
+The generated metrics are prefixed with `netobserv_` or `flow_`.

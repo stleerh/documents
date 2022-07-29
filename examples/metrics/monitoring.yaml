@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+data:
+  config.yaml: |
+    enableUserWorkload: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: flowlogs-pipeline
+  name: flowlogs-pipeline-metrics
+  namespace: network-observability
+spec:
+  ports:
+  - port: 9102
+    protocol: TCP
+    targetPort: 9102
+    name: metrics
+  selector:
+    app: flowlogs-pipeline
+  type: ClusterIP
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: flowlogs-pipeline
+  namespace: network-observability
+spec:
+  endpoints:
+  - interval: 15s
+    port: metrics
+    scheme: http
+  namespaceSelector:
+    matchNames:
+    - network-observability
+  selector:
+    matchLabels:
+      app: flowlogs-pipeline
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: netobserv-console-plugin
+  namespace: network-observability
+spec:
+  endpoints:
+  - interval: 15s
+    port: main
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
+  namespaceSelector:
+    matchNames:
+    - network-observability
+  selector:
+    matchLabels:
+      app: network-observability-plugin

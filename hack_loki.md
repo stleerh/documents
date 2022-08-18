@@ -78,9 +78,9 @@ kubectl create ns openshift-logging
 
 Then create a `LokiStack` in `openshift-logging` namespace from:
 Administrator view -> Operators -> Installed Operators -> Loki Operator -> LokiStack -> Create LokiStack
-- ensure the name is `lokistack`
+- ensure the name is `lokistack-network`
 - set `Object Storage` -> `Secret`. Check [documentation](https://loki-operator.dev/docs/object_storage.md/).
-- ensure `Tenants Configuration` -> `Mode` is set to `openshift-logging`
+- ensure `Tenants Configuration` -> `Mode` is set to `openshift-network`
 
 This will create `gateway`, `distributor`, `compactor`, `ingester`, `querier` and `query-frontend` components.
 
@@ -89,12 +89,12 @@ To allow `flowlogs-pipeline` to write to the gateway and `network-observability-
 oc apply -f examples/loki-role.yaml
 ```
 
-Then you will be able to set the following configuration in `FlowCollector` for `application` tenant:
+Then you will be able to set the following configuration in `FlowCollector` for `network` tenant:
 ```yaml
   loki:
-    tenantID: application
     sendAuthToken: true
-    url: 'https://lokistack-gateway-http.openshift-logging.svc.cluster.local:8080/api/logs/v1/application/'
+    url: 'https://lokistack-network-gateway-http.openshift-logging.svc.cluster.local:8080/api/logs/v1/network/'
+    statusUrl: 'https://lokistack-network-query-frontend-http.openshift-logging.svc.cluster.local:3100'
 ```
 
 ### Troubleshooting

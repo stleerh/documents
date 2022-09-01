@@ -29,3 +29,7 @@ You will need [Kind](./kind.md) or [OpenShift](./openshift.md) with ovn-kubernet
 For quick development on OCP use [this guide](./noo_dev_ocp.md)
 
 If you don't need the entire stack, you can just [check components](#repositories) above.
+
+### Sample applications
+
+[sample_apps.md](./sample_apps.md): a few suggestions to generate traffic, useful for testing NetObserv.

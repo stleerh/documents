@@ -1,0 +1,129 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kube-traffic-generator
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: traffic-generator-service-account
+  namespace: kube-traffic-generator
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: traffic-generator
+  namespace: kube-traffic-generator
+spec:
+  serviceAccount: traffic-generator-service-account
+  containers:
+    - name: kube-traffic-generator
+      image: lachlanevenson/k8s-kubectl
+      command:
+        - /bin/sh
+        - -ec
+        - |
+          apk add --no-cache curl
+
+          kubectl apply -f /etc/config/petclinic-config.yaml
+
+          i=0
+          scaleup="1"
+          while true; do
+            if [[ $(( $i % 100 )) -eq "0" ]]; then
+              if [[ $scaleup -eq "1" ]]; then
+                kubectl scale deployment spring-petclinic-web --replicas 40
+                echo "Scaled up"
+                scaleup="0"
+              else
+                kubectl scale deployment spring-petclinic-web --replicas 20
+                echo "Scaled down"
+                scaleup="1"
+              fi
+            fi
+
+            curl http://petclinic:28080/owners > /dev/null || true
+            curl http://petclinic:28080/ > /dev/null || true
+            curl http://petclinic:28080/vets > /dev/null|| true
+
+            sleep 1
+            i=$((i+1))
+            echo "Incremented counter to $i"
+          done
+      volumeMounts:
+        - name: petclinic-config
+          mountPath: /etc/config
+  volumes:
+    - name: petclinic-config
+      configMap:
+        name: traffic-generator-configmap
+        items:
+          - key: petclinic-config
+            path: petclinic-config.yaml
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traffic-generator-configmap
+  namespace: kube-traffic-generator
+data:
+  petclinic-config: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: spring-petclinic-web
+      namespace: kube-traffic-generator
+    spec:
+      selector:
+        matchLabels:
+          app: petclinic
+      replicas: 2
+      template:
+        metadata:
+          labels:
+            app: petclinic
+        spec:
+          containers:
+          - name: petclinic
+            image: jbrisbin/spring-petclinic
+            ports:
+            - containerPort: 8080
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: petclinic
+      namespace: kube-traffic-generator
+    spec:
+      selector:
+        app: petclinic
+      ports:
+      - protocol: TCP
+        port: 28080
+        targetPort: 8080
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: kube-traffic-generator
+  name: deployments-updater
+rules:
+- apiGroups: ["extensions", "apps"]
+  resources: ["deployments", "deployments/scale"]
+  verbs: ["get", "watch", "update", "patch", "create", "delete", "list"]
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "watch", "create", "patch", "update", "delete", "list"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: update-deployments
+  namespace: kube-traffic-generator
+subjects:
+- kind: ServiceAccount
+  name: traffic-generator-service-account
+roleRef:
+  kind: Role
+  name: deployments-updater
+  apiGroup: rbac.authorization.k8s.io

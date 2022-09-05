@@ -83,7 +83,7 @@ kubectl delete --recursive -f ./examples/distributed-loki
 
 ## Hack script
 
-A [hack script](./hack/loki-distributed.sh) is provided to run the steps described above. It assumes you have the AWS CLI installed with credentials in `~/.aws/credentials`. It will create a S3 bucket and configure Loki with it.
+A [hack script](./hack/loki-distributed.sh) is provided to run the steps described above. It assumes you have the AWS CLI installed with credentials configured. It will create a S3 bucket and configure Loki with it.
 
 The first argument is the bucket name, second is the AWS region. Example:
 

@@ -11,7 +11,7 @@ data:
     auth_enabled: false
     common:
       storage:
-        $(LOKI_STORE)
+        ${LOKI_STORE}
     server:
       http_listen_port: 3100
       http_server_read_timeout: 1m
@@ -73,7 +73,7 @@ data:
       configs:
         - from: 2022-01-01
           store: boltdb-shipper
-          object_store: $(LOKI_STORE_NAME)
+          object_store: ${LOKI_STORE_NAME}
           schema: v11
           index:
             prefix: index_

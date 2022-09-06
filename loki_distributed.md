@@ -71,7 +71,25 @@ Ensure [storage configuration](#storage-configuration) is up to date.
 Run the following command to apply all yamls at once in `network-observability` namespace:
 `kubectl apply -f ./examples/distributed-loki/ -n network-observability --recursive`
 
-This will create all the components and services described above. 
+This will create all the components and services described above.
+
+## Destroy
+
+Delete everything by running:
+
+```bash
+kubectl delete --recursive -f ./examples/distributed-loki
+```
+
+## Hack script
+
+A [hack script](./hack/loki-distributed.sh) is provided to run the steps described above. It assumes you have the AWS CLI installed with credentials configured. It will create a S3 bucket and configure Loki with it.
+
+The first argument is the bucket name, second is the AWS region. Example:
+
+```bash
+./hack/loki-distributed.sh netobserv-loki eu-west-1
+```
 
 ## Network Observability Operator
 

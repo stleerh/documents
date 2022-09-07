@@ -9,7 +9,7 @@ Simply install it and create a "Kafka" instance in `default` namespace.
 You can use the following command to deploy the strimzi operator :
 
 ```
-export NAMESPACE=network-observability
+export NAMESPACE=netobserv
 kubectl create -f "https://strimzi.io/install/latest?namespace=$NAMESPACE" -n $NAMESPACE
 ```
 
@@ -68,8 +68,8 @@ You can use [kfk](https://github.com/systemcraftsman/strimzi-kafka-cli), a CLI f
 To create a new user with public/private keys for mTLS, and get its secrets:
 
 ```bash
-kfk users --create --user flp-kafka --authentication-type tls -n network-observability -c kafka-cluster
-kubectl describe secret/flp-kafka -n network-observability
+kfk users --create --user flp-kafka --authentication-type tls -n netobserv -c kafka-cluster
+kubectl describe secret/flp-kafka -n netobserv
 ```
 
 To create a terminal-based producer and consumer with mTLS, refer to [this page](https://github.com/systemcraftsman/strimzi-kafka-cli/tree/main/examples/2_tls_authentication).

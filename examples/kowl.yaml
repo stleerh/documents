@@ -8,7 +8,7 @@ kowl:
     kafka:
       brokers:
         # Set your bootstrap url. Kowl does domain name validation so be sure to pick a valid url which is covered in the subject alternative name of the certificate of the bootsrap endpoint (e.g. no <namespace>.svc.cluster.local address).
-        -  kafka-cluster-kafka-bootstrap.network-observability
+        -  kafka-cluster-kafka-bootstrap.netobserv
       tls:
         enabled: true
         caFilepath: /etc/strimzi/ca/ca.crt

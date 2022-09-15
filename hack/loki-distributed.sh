@@ -28,21 +28,24 @@ export LOKI_STORE="
           secret_access_key: \${SECRET_ACCESS_KEY}
           s3forcepathstyle: true"
 
+NAMESPACE=netobserv
+
+kubectl create namespace $NAMESPACE
 cat examples/distributed-loki/1-prerequisites/secret.yaml \
 	| sed -r "s/X{5,}/$AWS_KEY/" \
 	| sed -r "s~Y{5,}~$AWS_SECRET~" \
-	| kubectl apply -f -
+	| kubectl apply -n $NAMESPACE -f -
 
-envsubst < examples/distributed-loki/1-prerequisites/config.yaml | kubectl apply -f -
-kubectl apply -f examples/distributed-loki/1-prerequisites/service-account.yaml
-kubectl apply -f examples/distributed-loki/2-components/
-kubectl apply -f examples/distributed-loki/3-services/
+envsubst < examples/distributed-loki/1-prerequisites/config.yaml | kubectl apply -n $NAMESPACE -f -
+kubectl apply -n $NAMESPACE -f examples/distributed-loki/1-prerequisites/service-account.yaml
+kubectl apply -n $NAMESPACE -f examples/distributed-loki/2-components/
+kubectl apply -n $NAMESPACE -f examples/distributed-loki/3-services/
 
 echo ""
 echo "Deployment complete"
 echo ""
 echo "To delete all created Kube resources, run:"
-echo "kubectl delete --recursive -f examples/distributed-loki"
+echo "kubectl delete -n $NAMESPACE --recursive -f examples/distributed-loki"
 echo ""
 echo "To delete the S3 bucket, run:"
 echo "aws s3 rm s3://$S3_NAME --recursive"

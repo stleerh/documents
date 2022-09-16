@@ -2,22 +2,19 @@
 This repo contains various documents related to network observability (a.k.a. netobserv):
 
 ### Repositories
-* [network-observability-operator](https://github.com/netobserv/network-observability-operator)
+* [netobserv-operator](https://github.com/netobserv/network-observability-operator)
     OpenShift / Kubernetes operator for network observability.
     This operator will deloy the following components:
-    * [goflow2-kube-enricher](https://github.com/netobserv/goflow2-kube-enricher)
-        This component implements the following libraries:
-        * [loki-client-go](https://github.com/netobserv/loki-client-go)
-        An HTTP client to send logs to Loki server
-        * [goflow2-loki-exporter](https://github.com/netobserv/goflow2-loki-exporter)
-        A Loki exporter plugin
-    * [network-observability-console-plugin](https://github.com/netobserv/network-observability-console-plugin)
-    Network Observability plugin for the Openshift Console
-    * [nflow-generator](https://github.com/netobserv/nflow-generator)
-    A fake legacy v5 netflow generator
+    * [eBPF Agent](https://github.com/netobserv/netobserv-ebpf-agent): An eBPF agent that captures and exports network flows.
+    * [flowlogs-pipeline](https://github.com/netobserv/flowlogs-pipeline): A configurable flow collector, enricher and metrics producer.
+    * [netobserv-plugin](https://github.com/netobserv/network-observability-console-plugin):
+    The NetObserv plugin for the Openshift Console.
+* [nflow-generator](https://github.com/netobserv/nflow-generator):
+A fake legacy v5 netflow generator
+* etc.
 
 ### Get started
-The easiest way to get started is to use the [Network Observability Operator](https://github.com/netobserv/network-observability-operator) that will deploy all the components for you.
+The easiest way to get started is to use the [NetObserv Operator](https://github.com/netobserv/network-observability-operator) that will deploy all the components for you. It is available via [OLM](https://operatorhub.io/operator/netobserv-operator).
 
 You can either:
 - [Deploy an existing image](https://github.com/netobserv/network-observability-operator#deploy-an-existing-image)
@@ -25,11 +22,10 @@ You can either:
 
 ### Development
 
-You will need [Kind](./kind.md) or [OpenShift](./openshift.md) with ovn-kubernetes configured to get network flows.
-For quick development on OCP use [this guide](./noo_dev_ocp.md)
+You will need a Kubernetes cluster, such as [Kind](./kind.md) or [OpenShift](./openshift.md).
 
 If you don't need the entire stack, you can just [check components](#repositories) above.
 
-### Sample applications
+### Other links
 
-[sample_apps.md](./sample_apps.md): a few suggestions to generate traffic, useful for testing NetObserv.
+- [Sample apps](./sample_apps.md): a few suggestions to generate traffic, useful for testing NetObserv.

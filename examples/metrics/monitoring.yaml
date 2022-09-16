@@ -13,7 +13,7 @@ metadata:
   labels:
     app: flowlogs-pipeline
   name: flowlogs-pipeline-metrics
-  namespace: network-observability
+  namespace: netobserv
 spec:
   ports:
   - port: 9102
@@ -28,7 +28,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: flowlogs-pipeline
-  namespace: network-observability
+  namespace: netobserv
 spec:
   endpoints:
   - interval: 15s
@@ -36,7 +36,7 @@ spec:
     scheme: http
   namespaceSelector:
     matchNames:
-    - network-observability
+    - netobserv
   selector:
     matchLabels:
       app: flowlogs-pipeline
@@ -45,7 +45,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: netobserv-console-plugin
-  namespace: network-observability
+  namespace: netobserv
 spec:
   endpoints:
   - interval: 15s
@@ -55,7 +55,7 @@ spec:
       insecureSkipVerify: true
   namespaceSelector:
     matchNames:
-    - network-observability
+    - netobserv
   selector:
     matchLabels:
-      app: network-observability-plugin
+      app: netobserv-plugin

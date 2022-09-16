@@ -68,8 +68,8 @@ Check [official examples](https://grafana.com/docs/loki/latest/storage/#examples
 ## Deploy
 
 Ensure [storage configuration](#storage-configuration) is up to date.
-Run the following command to apply all yamls at once in `network-observability` namespace:
-`kubectl apply -f ./examples/distributed-loki/ -n network-observability --recursive`
+Run the following command to apply all yamls at once in `netobserv` namespace:
+`kubectl apply -f ./examples/distributed-loki/ -n netobserv --recursive`
 
 This will create all the components and services described above.
 
@@ -93,10 +93,10 @@ The first argument is the bucket name, second is the AWS region. Example:
 
 ## Network Observability Operator
 
-To connect NOO with this config, you will have to update the `loki` section with the following urls assuming you used `network-observability` namespace:
+To connect NOO with this config, you will have to update the `loki` section with the following urls assuming you used `netobserv` namespace:
 
 ```yaml
   loki:
-    url: 'http://loki-distributed-distributor.network-observability.svc.cluster.local:3100/'
-    querierUrl: 'http://loki-distributed-query-frontend.network-observability.svc.cluster.local:3100/'
+    url: 'http://loki-distributed-distributor.netobserv.svc.cluster.local:3100/'
+    querierUrl: 'http://loki-distributed-query-frontend.netobserv.svc.cluster.local:3100/'
 ```

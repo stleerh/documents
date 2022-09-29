@@ -147,7 +147,7 @@ spec:
         name: loki-config
   containers:
     - name: loki
-      image: grafana/loki:2.4.1
+      image: grafana/loki:2.6.1
       volumeMounts:
         - mountPath: "/loki-store"
           name: loki-store

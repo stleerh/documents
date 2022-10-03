@@ -26,6 +26,7 @@ spec:
       default.replication.factor: 1
       min.insync.replicas: 1
       inter.broker.protocol.version: "3.1"
+      auto.create.topics.enable: false
     storage:
       type: persistent-claim 
       size: 200Gi 

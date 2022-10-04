@@ -12,6 +12,12 @@ You can use the following command to deploy the strimzi operator :
 export NAMESPACE=netobserv
 kubectl create -f "https://strimzi.io/install/latest?namespace=$NAMESPACE" -n $NAMESPACE
 ```
+## Update storage class of kafka cluster
+```
+export DEFAULT_SC=$(kubectl get storageclass -o=jsonpath='{.items[?(@.metadata.annotations.storageclass\.kubernetes\.io/is-default-class=="true")].metadata.name}')
+tmpfile=$(mktemp)
+envsubst < ./examples/kafka/default.yaml > $tmpfile && mv $tmpfile ./examples/kafka/default.yaml
+```
 
 ## Creating the default cluster
 

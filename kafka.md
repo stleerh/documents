@@ -71,6 +71,52 @@ kubectl delete -f ./examples/kafka/metrics-config.yaml -n $NAMESPACE
 
 You can use [kfk](https://github.com/systemcraftsman/strimzi-kafka-cli), a CLI for Kafka / Strimzi, to interact with the cluster. Examples:
 
+### Listening to the exporter topic
+
+Create a topic for export, e.g. `netobserv-flows-export`:
+
+```bash
+kubectl apply -f ./examples/kafka/topic-export.yaml
+kfk topics --cluster kafka-cluster -n netobserv  --list
+```
+
+will display something like:
+
+```
+NAME                                                                                               CLUSTER         PARTITIONS   REPLICATION FACTOR   READY
+consumer-offsets---84e7a678d08f4bd226872e5cdd4eb527fadc1c6a                                        kafka-cluster   50           1                    True
+netobserv-flows-export                                                                             kafka-cluster   24           1                    True
+network-flows                                                                                      kafka-cluster   24           1                    True
+strimzi-store-topic---effb8e3e057afce1ecf67c3f5d8e4e3ff177fc55                                     kafka-cluster   1            1                    True
+strimzi-topic-operator-kstreams-topic-store-changelog---b75e702040b99be8a9263134de3507fc0cc4017b   kafka-cluster   1            1                    True
+```
+
+In `FlowCollector` resource, configure the exporter accordingly:
+
+```yaml
+  exporters:
+    - type: KAFKA
+      kafka:
+        address: "kafka-cluster-kafka-bootstrap.netobserv"
+        topic: netobserv-flows-export
+```
+
+Connect to the topic as a consummer, using `kfk console-consumer`:
+
+```bash
+kfk console-consumer --topic netobserv-flows-export -n netobserv -c kafka-cluster
+```
+
+You should soon see the enriched flows coming in, as json:
+
+```
+{"Bytes":66,"DstAddr":"10.0.181.113","DstK8S_Name":"ip-10-0-181-113.eu-west-1.compute.internal","DstK8S_Namespace":"","DstK8S_OwnerName":"ip-10-0-181-113.eu-west-1.compute.internal","DstK8S_OwnerType":"Node","DstK8S_Type":"Node","DstMac":"06:70:08:FF:88:53","DstPort":6443,"Etype":2048,"FlowDirection":0,"Interface":"br-ex","Packets":1,"Proto":6,"SrcAddr":"10.0.176.217","SrcMac":"06:A5:38:0F:E1:E9","SrcPort":15467,"TimeFlowEndMs":1666602825831,"TimeFlowStartMs":1666602825831,"TimeReceived":1666602829}
+{"Bytes":6897,"DstAddr":"10.131.0.11","DstK8S_HostIP":"10.0.143.168","DstK8S_HostName":"ip-10-0-143-168.eu-west-1.compute.internal","DstK8S_Name":"prometheus-k8s-0","DstK8S_Namespace":"openshift-monitoring","DstK8S_OwnerName":"prometheus-k8s","DstK8S_OwnerType":"StatefulSet","DstK8S_Type":"Pod","DstMac":"0A:58:0A:80:00:01","DstPort":53598,"Etype":2048,"FlowDirection":0,"Interface":"8dda2b5704fb105","Packets":2,"Proto":6,"SrcAddr":"10.128.0.18","SrcK8S_HostIP":"10.0.181.113","SrcK8S_HostName":"ip-10-0-181-113.eu-west-1.compute.internal","SrcK8S_Name":"cloud-credential-operator-75f8d887bd-lmrcv","SrcK8S_Namespace":"openshift-cloud-credential-operator","SrcK8S_OwnerName":"cloud-credential-operator","SrcK8S_OwnerType":"Deployment","SrcK8S_Type":"Pod","SrcMac":"0A:58:0A:80:00:12","SrcPort":8443,"TimeFlowEndMs":1666602824686,"TimeFlowStartMs":1666602824686,"TimeReceived":1666602829}
+{"Bytes":872,"DstAddr":"10.0.206.183","DstMac":"06:A0:24:AD:72:1B","DstPort":19026,"Etype":2048,"FlowDirection":1,"Interface":"br-ex","Packets":1,"Proto":6,"SrcAddr":"10.0.181.113","SrcK8S_Name":"ip-10-0-181-113.eu-west-1.compute.internal","SrcK8S_Namespace":"","SrcK8S_OwnerName":"ip-10-0-181-113.eu-west-1.compute.internal","SrcK8S_OwnerType":"Node","SrcK8S_Type":"Node","SrcMac":"06:70:08:FF:88:53","SrcPort":6443,"TimeFlowEndMs":1666602824972,"TimeFlowStartMs":1666602824972,"TimeReceived":1666602829}
+```
+
+### TLS management
+
 To create a new user with public/private keys for mTLS, and get its secrets:
 
 ```bash

@@ -4,7 +4,7 @@ metadata:
   name: kafka-cluster
 spec:
   kafka:
-    version: 3.1.0
+    version: 3.2.0
     replicas: 1
     listeners:
       - name: plain
@@ -25,11 +25,11 @@ spec:
       transaction.state.log.min.isr: 1
       default.replication.factor: 1
       min.insync.replicas: 1
-      inter.broker.protocol.version: "3.1"
+      inter.broker.protocol.version: "3.2"
       auto.create.topics.enable: false
     storage:
-      type: persistent-claim 
-      size: 200Gi 
+      type: persistent-claim
+      size: 200Gi
       class: ${DEFAULT_SC}
     metricsConfig:
       type: jmxPrometheusExporter
@@ -40,8 +40,8 @@ spec:
   zookeeper:
     replicas: 3
     storage:
-      type: persistent-claim 
-      size: 20Gi 
+      type: persistent-claim
+      size: 20Gi
       class: ${DEFAULT_SC}
     metricsConfig:
       type: jmxPrometheusExporter

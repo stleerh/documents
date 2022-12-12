@@ -4,6 +4,57 @@ Grafana Loki is configured in a YAML file which contains information on the Loki
 
 Some of these need to be tweaked for network observability according to your cluster size, number of flows and sampling.
 
+## How to update configs
+
+Use the following commands to update your loki config in an easy way.
+
+### Using Zero Click
+
+Update [zero-click-loki/2-loki.yaml](./examples/zero-click-loki/2-loki.yaml) or Update [zero-click-loki/2-loki-tls.yaml](./examples/zero-click-loki/2-loki-tls.yaml)with your custom configuration.
+
+Then replace the related config using:
+```bash
+oc replace --force -f config.yaml
+```
+
+The pod will restart automatically.
+
+### Using Zero Click / Distributed Loki
+
+Update [distributed-loki/1-prerequisites/config.yaml](./examples/distributed-loki/1-prerequisites/config.yaml) with your custom configuration.
+
+Then replace the config using:
+```bash
+oc replace --force -f config.yaml
+```
+
+Restart all pods of `loki` instance:
+```bash
+oc delete pods --selector app.kubernetes.io/instance=loki -n netobserv
+```
+
+### Using Loki Operator
+
+LokiStack needs to be configured as `Unmanaged` management state first to allow configmap updates.
+
+Run the following command to get the `lokistack-config` configmap in `netobserv` namespace:
+```bash
+oc get configmap lokistack-config -n netobserv -o yaml | yq '.binaryData | map_values(. | @base64d)' > binaryData.txt
+```
+
+Update the binaryData.txt file accordingly.
+
+Then run the following command to update `lokistack-config` configmap in `netobserv` namespace using the updated file:
+```bash
+BINARY_CONFIG=$(yq -o=json -I=0 'map_values(. | @base64)' binaryData.txt) && echo $BINARY_CONFIG
+oc patch configmap lokistack-config -n netobserv -p '{"binaryData":'$BINARY_CONFIG'}'
+```
+
+Restart all pods of `lokistack` instance:
+```bash
+oc delete pods --selector app.kubernetes.io/name=lokistack -n netobserv
+```
+
 ## Wide time range queries - too many outstanding requests
 
 > The query frontend splits larger queries into multiple smaller queries, executing these queries in parallel on downstream queriers and stitching the results back together again. This prevents large (multi-day, etc) queries from causing out of memory issues in a single querier and helps to execute them faster.

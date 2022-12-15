@@ -142,3 +142,11 @@ Ingestion is limited in terms of sample size per second as `ingestion_rate_mb` a
 It's common to put more than `10Mb` on each. You can safely increase these two values but keep an eye on your ingester performances and on your storage size.
 
 Check [limits_config](https://grafana.com/docs/loki/latest/configuration/#limits_config) for more details.
+
+## Maximum of series for a single query
+
+Metric queries are limited in terms of unique series count. You can increase `max_query_series` up to `10000` if you get `maximum of series reached for a single query` error in the console plugin.
+
+We don't recommend to go above `10000` since it affects both query frontend stability and browser rendering performance. 
+
+Check [limits_config](https://grafana.com/docs/loki/latest/configuration/#limits_config) for more details.

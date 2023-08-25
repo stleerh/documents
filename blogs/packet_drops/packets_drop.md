@@ -1,8 +1,6 @@
 # Network Observability Real-Time Per Flow Packets Drop
 
-<p align="center">
-  <img src="packets_drop_logo.png" alt="logo" width="25%"/>
-</p>
+![logo](./images/packets_drop_logo.png)
 
 By: Amogh RD, Julien Pinsonneau and Mohamed S. Mahmoud
 
@@ -53,9 +51,85 @@ collector object with the following fields enabled in eBPF config
 section
 
 ```yaml
+apiVersion: flows.netobserv.io/v1beta1
+kind: FlowCollector
+metadata:
+  name: cluster
+spec:
   agent:
     type: EBPF
     ebpf:
       privileged: true
-      enablePktDrop: true
+      features:
+        - PacketsDrop
 ```
+
+## A quick tour in the UI
+
+Once `PacketsDrop` feature enabled, the Console plugin will automatically adapt to provide
+additionnal filters and show informations across views.
+
+Open your OCP Console and move to 
+`Administrator view` -> `Observe` -> `Network Traffic` page as usual.
+
+A new query option will show to filter flows by their drop status:
+
+![drop filter query option](./images/drop_filter_query_option.png)
+- Fully dropped shows the flows that are 100% dropped
+- Containing drops shows the flows having at least one packet dropped
+- Without drops show the flows having 0% dropped
+- All shows everything
+
+Two new filters, `Packet drop TCP state` and `Packet drop latest cause` will be available 
+in the common section:
+
+![drop state & cause filters](./images/drop_state_cause_filters.png)
+
+The first one will allow you to set TCP state filter:
+
+![state filter](./images/state_filter.png)
+
+- A _LINUX_TCP_STATES_H number like 1, 2, 3
+- A _LINUX_TCP_STATES_H TCP name like ESTABLISHED, SYN_SENT, SYN_RECV
+
+The second one will let you pick causes to filter on:
+
+![cause filter](./images/cause_filter.png)
+
+- A _LINUX_DROPREASON_CORE_H number like 2, 3, 4
+- A _LINUX_DROPREASON_CORE_H SKB_DROP_REASON name like NOT_SPECIFIED, 
+NO_SOCKET, PKT_TOO_SMALL
+
+### Overview
+New graphs will be introduced in the `advanced options` -> `manage panels` popup:
+
+![advanced options](./images/advanced_options.png)
+
+- Top X flow dropped rates stacked
+- Total dropped rate
+- Top X dropped state
+- Top X dropped cause
+- Top X flow dropped rates stacked with total
+
+Select the desired graphs to render them in the overview panel:
+
+![drop graphs 1](./images/drop_graphs1.png)
+![drop graphs 2](./images/drop_graphs2.png)
+![drop graphs 3](./images/drop_graphs3.png)
+
+Note that you can compare the top drops against total dropped or total traffic in the 
+last graph using the kebab menu
+![drop graph option](./images/drop_graph_options.png)
+
+### Traffic flows
+The table view shows the number of `bytes` and `packets` sent in green and the related numbers
+dropped in red. On top of that, you can get details about the drop in the side panel that will
+bring you to the proper documentation.
+
+![drop table](./images/drop_table.png)
+
+### Topology
+Last but not least, the topology view display edges containing drops in red. That's usefull 
+especially when digging on a specific drop reason between two resources.
+
+![drop topology](./images/drop_topology.png)

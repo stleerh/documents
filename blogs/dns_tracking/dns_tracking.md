@@ -3,6 +3,7 @@
 ![logo](./images/dns_tracking_logo.png)
 
 By: Julien Pinsonneau, Mehul Modi and Mohamed S. Mahmoud
+<style>body {text-align: justify}</style>
 
 In today's interconnected digital landscape, Domain Name System (DNS) tracking
 plays a crucial role in networking and security.
@@ -22,8 +23,8 @@ recap how DNS resolution works.
 When you enter a website's domain name (e.g., www.example.com) in your
 browser, your computer needs to find the corresponding IP address.
 This process involves multiple steps, including querying DNS servers,
-caching responses, and ultimately obtaining the IP address for
-establishing a connection.
+caching responses, obtaining the IP address to establish a connection
+and caching response for future re-occurrence of same DNS query.
 
 ## Utilizing Tracepoint Hooks for DNS Tracking
 
@@ -33,8 +34,10 @@ For DNS tracking, we leveraged tracepoint hooks associated with DNS
 resolution processes specifically `tracepoint/net/net_dev_queue` tracepoint,
 Then we parse the DNS header to determine if its query or response, attempt
 to correlate query and response for specific DNS transaction and then record the
-elapsed time as well as enrich the flow with DNS header's information like DNS Id
-and DNS flags to help UI filtering.
+elapsed time to compute DNS latency. Further, DNS network flows are enriched
+to include fields, viz. DNS Id, DNS latency and DNS response codes to help
+build graphs with aggregated DNS statistics and to help filtering on specific
+fields in Network Observability console.
 
 ## Potential Use Cases
 
@@ -74,30 +77,34 @@ spec:
 
 ## A quick tour in the UI
 
-Once `DnsTacking` feature enabled, the Console plugin will automatically adapt to provide
-additionnal filters and show informations across views.
+Once `DnsTacking` feature enabled, the Console plugin will automatically
+adapt to provide additional filters and show informations across views.
 
-Open your OCP Console and move to 
+Open your OCP Console and move to
 `Administrator view` -> `Observe` -> `Network Traffic` page as usual.
 
-Three new filters, `DNS Id`, `DNS Latency` and `DNS Response Code` will be available 
+Three new filters, `DNS Id`, `DNS Latency` and `DNS Response Code` will be available
 in the common section:
 
 ![dns filters](./images/dns_filters.png)
 
-The first one will allow you to filter on a specific DNS Id to correlate with your query.
+The first one will allow you to filter on a specific DNS Id to correlate
+with your query.
 
 ![dns id](./images/dns_id.png)
 
-The second one helps to identify potential performance issues by looking at DNS resolution latency.
+The second one helps to identify potential performance issues by looking at DNS
+resolution latency.
 
 ![dns latency more than](./images/dns_latency_more_than.png)
 
-The third filter surfaces DNS response codes, which can help detect errors or unauthorized resolutions.
+The third filter surfaces DNS response codes, which can help detect errors or
+unauthorized resolutions.
 
 ![dns rcode](./images/dns_response_code.png)
 
 ### Overview
+
 New graphs will be introduced in the `advanced options` -> `manage panels` popup:
 
 ![advanced options 1](./images/advanced_options1.png)
@@ -109,22 +116,21 @@ New graphs will be introduced in the `advanced options` -> `manage panels` popup
 ![dns graphs 1](./images/dns_graphs1.png)
 ![dns graphs 2](./images/dns_graphs2.png)
 
-
 ### Traffic flows
-The table view will get the new DNS related columns `Id`, `Latency` and `Response code` available from 
-the `advanced options` -> `manage columns` popup
+
+The table view will get the new DNS columns `Id`, `Latency` and
+`Response code` available from the `advanced options` -> `manage columns` popup
 
 ![advanced options 2](./images/advanced_options2.png)
 
-The DNS related flows will show these informations in both table and side panel:
+The DNS flows will show these informations in both table and side panel:
 
 ![dns table](./images/dns_table.png)
 
 ## Future support
 
-- looking at adding mDNS
+- Adding tracking capability for mDNS
 
-- Adding support to DNS over TCP
+- Adding support for DNS over TCP
 
-- Investigating options to handle DNS over TLS where the DNS header is fully encrypted.
-
+- Investigate options to handle DNS over TLS where the DNS header is fully encrypted.

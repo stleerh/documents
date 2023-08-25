@@ -1,8 +1,6 @@
 # Network Observability Per Flow DNS tracking
 
-<p align="center">
-  <img src="dns_tracking_logo.png" alt="logo" width="25%"/>
-</p>
+![logo](./images/dns_tracking_logo.png)
 
 By: Julien Pinsonneau, Mehul Modi and Mohamed S. Mahmoud
 
@@ -61,12 +59,66 @@ collector object with the following fields enabled in eBPF config
 section
 
 ```yaml
+apiVersion: flows.netobserv.io/v1beta1
+kind: FlowCollector
+metadata:
+  name: cluster
+spec:
   agent:
     type: EBPF
     ebpf:
       privileged: true
-      enableDNSTracking: true
+      features:
+        - DnsTacking
 ```
+
+## A quick tour in the UI
+
+Once `DnsTacking` feature enabled, the Console plugin will automatically adapt to provide
+additionnal filters and show informations across views.
+
+Open your OCP Console and move to 
+`Administrator view` -> `Observe` -> `Network Traffic` page as usual.
+
+Three new filters, `DNS Id`, `DNS Latency` and `DNS Response Code` will be available 
+in the common section:
+
+![dns filters](./images/dns_filters.png)
+
+The first one will allow you to filter on a specific DNS Id to correlate with your query.
+
+![dns id](./images/dns_id.png)
+
+The second one helps to identify potential performance issues by looking at DNS resolution latency.
+
+![dns latency more than](./images/dns_latency_more_than.png)
+
+The third filter surfaces DNS response codes, which can help detect errors or unauthorized resolutions.
+
+![dns rcode](./images/dns_response_code.png)
+
+### Overview
+New graphs will be introduced in the `advanced options` -> `manage panels` popup:
+
+![advanced options 1](./images/advanced_options1.png)
+
+- Top 5 average DNS latencies
+- Top 5 DNS response code
+- Top 5 DNS response code stacked with total
+
+![dns graphs 1](./images/dns_graphs1.png)
+![dns graphs 2](./images/dns_graphs2.png)
+
+
+### Traffic flows
+The table view will get the new DNS related columns `Id`, `Latency` and `Response code` available from 
+the `advanced options` -> `manage columns` popup
+
+![advanced options 2](./images/advanced_options2.png)
+
+The DNS related flows will show these informations in both table and side panel:
+
+![dns table](./images/dns_table.png)
 
 ## Future support
 

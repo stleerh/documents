@@ -33,12 +33,14 @@ Packets drop ebpf hook supports TCP, UDP, SCTP, ICMPv4 and ICMPv6 protocols.
 There are two main categories for packet drops, core subsystem drops which cover
 most of the host drop reasons; for the complete list please refer to
 https://github.com/torvalds/linux/blob/master/include/net/dropreason-core.h
-and OVS based drops which is a recent kernel enhancement; for reference please checkout the following link
+and OVS based drops which is a recent kernel enhancement; for reference please 
+checkout the following link
 https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/openvswitch/drop.h.
 
 ## Kernel support
 
-The drop cause tracepoint API is a recent kernel feature only available from rhel9.2 kernel version. Older kernel will ignore this feature if its configured.
+The drop cause tracepoint API is a recent kernel feature only available from RHEL9.2 
+kernel version. Older kernel will ignore this feature if its configured.
 
 ## How to enable packet drops
 
@@ -126,7 +128,26 @@ bring you to the proper documentation.
 ![drop table](./images/drop_table.png)
 
 ### Topology
-Last but not least, the topology view display edges containing drops in red. That's usefull 
+Last but not least, the topology view display edges containing drops in red. That's useful 
 especially when digging on a specific drop reason between two resources.
 
 ![drop topology](./images/drop_topology.png)
+
+## Performance impact of using PacketDrop
+The performance impact of using PacketDrop enabled with the Network Observability operator
+is on the flowlogs-pipeline(FLP) component. FLP uses higher CPU than baseline(about a 22% increase) whereas there is not much considerable impact(less than 3% increase) on other components of the operator.
+
+## Potential use-case scenarios
+- NO_SOCKET drop reason: There might be packet drops observed due to the destination port being not reachable. This can be emulated by running a curl command on a node to an unknown port `while : ; do curl <another nodeIP>:<unknown port>; sleep 5; done`.
+The drops can be observed on the console as seen below:
+
+Will update screenshots here
+
+- OVS_DROP_LAST_ACTION drop reason: OVS packet drops can be observed on RHEL9 and above. It
+can be emulated by running the iperf command with network-policy set to drop on a particular port. These drops can be observed on the console as seen below:
+
+![OVS drop table](./images/OVS_table.png)
+
+![OVS drop topology](./images/OVS_topology.png)
+
+![OVS drop overview](./images/OVS_overview.png)

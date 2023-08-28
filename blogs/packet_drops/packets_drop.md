@@ -31,23 +31,20 @@ for TCP only the latest TCP connection state as well as the TCP connection flags
 are added.
 Packets drop ebpf hook supports TCP, UDP, SCTP, ICMPv4 and ICMPv6 protocols.
 There are two main categories for packet drops, core subsystem drops which cover
-most of the host drop reasons for the complete list please refer to
+most of the host drop reasons; for the complete list please refer to
 https://github.com/torvalds/linux/blob/master/include/net/dropreason-core.h
-The other category is for OVS based drops which is very recent kernel enhancement
-and for reference please checkout the following link
+and OVS based drops which is a recent kernel enhancement; for reference please checkout the following link
 https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/openvswitch/drop.h.
 
 ## Kernel support
 
-The drop cause tracepoint API is a very recent kernel feature so to be able
-to use it we need rhel9.2 kernel or above. older kernel will ignore
-this feature if its configured.
+The drop cause tracepoint API is a recent kernel feature only available from rhel9.2 kernel version. Older kernel will ignore this feature if its configured.
 
 ## How to enable packet drops
 
 By default packets drop detection is disabled because it requires
-`privileged` access, to enable this feature we need to create a flow
-collector object with the following fields enabled in eBPF config
+`privileged` access to the host kernel. To enable the feature we need 
+to create a flowcollector object with the following fields enabled in eBPF config
 section
 
 ```yaml
@@ -75,9 +72,9 @@ Open your OCP Console and move to
 A new query option will show to filter flows by their drop status:
 
 ![drop filter query option](./images/drop_filter_query_option.png)
-- Fully dropped shows the flows that are 100% dropped
+- Fully dropped shows the flows that have 100% dropped packets
 - Containing drops shows the flows having at least one packet dropped
-- Without drops show the flows having 0% dropped
+- Without drops show the flows having 0% dropped packets
 - All shows everything
 
 Two new filters, `Packet drop TCP state` and `Packet drop latest cause` will be available 

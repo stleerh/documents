@@ -141,7 +141,9 @@ is on the flowlogs-pipeline(FLP) component. FLP uses higher CPU than baseline(ab
 - NO_SOCKET drop reason: There might be packet drops observed due to the destination port being not reachable. This can be emulated by running a curl command on a node to an unknown port `while : ; do curl <another nodeIP>:<unknown port>; sleep 5; done`.
 The drops can be observed on the console as seen below:
 
-Will update screenshots here
+![NO_SOCKET drop table](./images/NO_SOCKET_table.png)
+
+![NO_SOCKET drop overview](./images/NO_SOCKET_overview.png)
 
 - OVS_DROP_LAST_ACTION drop reason: OVS packet drops can be observed on RHEL9 and above. It
 can be emulated by running the iperf command with network-policy set to drop on a particular port. These drops can be observed on the console as seen below:

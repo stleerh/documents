@@ -30,18 +30,23 @@ the flow by enriching it with drop metadata such as packets and bytes statistics
 For TCP, only the latest TCP connection state as well as the TCP connection flags
 are added.
 The packet drops eBPF hook supports TCP, UDP, SCTP, ICMPv4 and ICMPv6 protocols.
-There are two main categories for packet drops. The first category, core subsystem drops,covers most of the host drop reasons; for the complete list please refer to [drop-reason](https://github.com/torvalds/linux/blob/master/include/net/dropreason-core.h).
-Second, there are OVS-based drops, which is a recent kernel enhancement; for reference please checkout the following link [OVS-drop-reason](https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/openvswitch/drop.h).
+There are two main categories for packet drops. The first category, core
+subsystem drops,covers most of the host drop reasons; for the complete
+list please refer to
+[drop-reason](https://github.com/torvalds/linux/blob/master/include/net/dropreason-core.h).
+Second, there are OVS-based drops, which is a recent kernel enhancement;
+for reference please checkout the following link
+[OVS-drop-reason](https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/openvswitch/drop.h).
 
 ## Kernel support
 
-The drop cause tracepoint API is a recent kernel feature only available from RHEL9.2 
+The drop cause tracepoint API is a recent kernel feature only available from RHEL9.2
 kernel version. Older kernel will ignore this feature if its configured.
 
 ## How to enable packet drops
 
 By default packets drops detection is disabled because it requires
-`privileged` access to the host kernel. To enable the feature we need 
+`privileged` access to the host kernel. To enable the feature we need
 to create a `FlowCollector` object with the following fields enabled in eBPF config
 section
 
@@ -61,21 +66,23 @@ spec:
 
 ## A quick tour in the UI
 
-Once the `PacketsDrop` feature is enabled, the OCP console plugin automatically adapts to provide
-additional filters and show information across Netflow Traffic page views.
+Once the `PacketsDrop` feature is enabled, the OCP console plugin automatically
+adapts to provide additional filters and show information across Netflow Traffic
+page views.
 
-Open your OCP Console and move to 
+Open your OCP Console and move to
 `Administrator view` -> `Observe` -> `Network Traffic` page as usual.
 
 Now, a new query option is available to filter flows by their drop status:
 
 ![drop filter query option](./images/drop_filter_query_option.png)
+
 - `Fully dropped` shows the flows that have 100% dropped packets
 - `Containing drops` shows the flows having at least one packet dropped
 - `Without drops` show the flows having 0% dropped packets
 - `All` shows all of the above
 
-Two new filters, `Packet drop TCP state` and `Packet drop latest cause` are available 
+Two new filters, `Packet drop TCP state` and `Packet drop latest cause` are available
 in the common section:
 
 ![drop state & cause filters](./images/drop_state_cause_filters.png)
@@ -92,10 +99,11 @@ The second one will let you pick causes to filter on:
 ![cause filter](./images/cause_filter.png)
 
 - A _LINUX_DROPREASON_CORE_H number like 2, 3, 4
-- A _LINUX_DROPREASON_CORE_H SKB_DROP_REASON name like `NOT_SPECIFIED`, 
-`NO_SOCKET`, `PKT_TOO_SMALL`
+- A _LINUX_DROPREASON_CORE_H SKB_DROP_REASON name like
+ `NOT_SPECIFIED`,`NO_SOCKET`, `PKT_TOO_SMALL`
 
 ### Overview
+
 New graphs are introduced in the `advanced options` -> `manage panels` popup:
 
 ![advanced options](./images/advanced_options.png)
@@ -112,32 +120,45 @@ Select the desired graphs to render them in the overview panel:
 ![drop graphs 2](./images/drop_graphs2.png)
 ![drop graphs 3](./images/drop_graphs3.png)
 
-Note that you can compare the top drops against total dropped or total traffic in the 
-last graph using the kebab menu
+Note that you can compare the top drops against total dropped or total traffic
+in the last graph using the kebab menu
 ![drop graph option](./images/drop_graph_options.png)
 
 ### Traffic flows
-The table view shows the number of `bytes` and `packets` sent in green and the related numbers
-dropped in red. Additionally, you can get details about the drop in the side panel that
-brings you to the proper documentation.
+
+The table view shows the number of `bytes` and `packets` sent in green and the
+related numbers dropped in red. Additionally, you can get details about the
+drop in the side panel that brings you to the proper documentation.
 
 ![drop table](./images/drop_table.png)
 
 ### Topology
-Last but not least, the topology view displays edges containing drops in red. That's useful 
-especially when digging on a specific drop reason between two resources.
+
+Last but not least, the topology view displays edges containing drops in red.
+That's useful especially when digging on a specific drop reason between two resources.
 
 ![drop topology](./images/drop_topology.png)
 
 ## Potential use-case scenarios
-- `NO_SOCKET` drop reason: There might be packet drops observed due to the destination port being not reachable. This can be emulated by running a curl command on a node to an unknown port `while : ; do curl <another nodeIP>:<unknown port>; sleep 5; done`.
+
+- `NO_SOCKET` drop reason: There might be packet drops observed due to the
+ destination port being not reachable. This can be emulated by running a
+ curl command on a node to an unknown port
+
+```bash
+while : ; do curl <another nodeIP>:<unknown port>; sleep 5; done
+```
+
 The drops can be observed on the console as seen below:
 
 ![NO_SOCKET drop table](./images/NO_SOCKET_table.png)
 
 ![NO_SOCKET drop overview](./images/NO_SOCKET_overview.png)
 
-- `OVS_DROP_LAST_ACTION` drop reason: OVS packet drops can be observed on RHEL9.2 and above. It can be emulated by running the iperf command with network-policy set to drop on a particular port. These drops can be observed on the console as seen below:
+- `OVS_DROP_LAST_ACTION` drop reason: OVS packet drops can be observed on
+ RHEL9.2 and above. It can be emulated by running the iperf command with
+ network-policy set to drop on a particular port.
+ These drops can be observed on the console as seen below:
 
 ![OVS drop table](./images/OVS_table.png)
 
@@ -146,5 +167,9 @@ The drops can be observed on the console as seen below:
 ![OVS drop overview](./images/OVS_overview.png)
 
 ## Resource impact of using PacketDrop
-The performance impact of using PacketDrop enabled with the Network Observability operator
-is noticeable on the flowlogs-pipeline(FLP) component using ~22% and ~9% more vCPU and memory respectively when compared to baseline whereas the impact on other components in not significant (less than 3% increase).
+
+The performance impact of using PacketDrop enabled with the Network
+Observability operator is noticeable on the flowlogs-pipeline(FLP)
+component using ~22% and ~9% more vCPU and memory respectively when
+compared to baseline whereas the impact on other components in not
+significant (less than 3% increase).

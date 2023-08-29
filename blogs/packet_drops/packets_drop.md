@@ -89,15 +89,15 @@ The first one will allow you to set TCP state filter:
 ![state filter](./images/state_filter.png)
 
 - A _LINUX_TCP_STATES_H number like 1, 2, 3
-- A _LINUX_TCP_STATES_H TCP name like ESTABLISHED, SYN_SENT, SYN_RECV
+- A _LINUX_TCP_STATES_H TCP name like `ESTABLISHED`, `SYN_SENT`, `SYN_RECV`
 
 The second one will let you pick causes to filter on:
 
 ![cause filter](./images/cause_filter.png)
 
 - A _LINUX_DROPREASON_CORE_H number like 2, 3, 4
-- A _LINUX_DROPREASON_CORE_H SKB_DROP_REASON name like NOT_SPECIFIED, 
-NO_SOCKET, PKT_TOO_SMALL
+- A _LINUX_DROPREASON_CORE_H SKB_DROP_REASON name like `NOT_SPECIFIED`, 
+`NO_SOCKET`, `PKT_TOO_SMALL`
 
 ### Overview
 New graphs will be introduced in the `advanced options` -> `manage panels` popup:
@@ -134,14 +134,14 @@ especially when digging on a specific drop reason between two resources.
 ![drop topology](./images/drop_topology.png)
 
 ## Potential use-case scenarios
-- NO_SOCKET drop reason: There might be packet drops observed due to the destination port being not reachable. This can be emulated by running a curl command on a node to an unknown port `while : ; do curl <another nodeIP>:<unknown port>; sleep 5; done`.
+- `NO_SOCKET` drop reason: There might be packet drops observed due to the destination port being not reachable. This can be emulated by running a curl command on a node to an unknown port `while : ; do curl <another nodeIP>:<unknown port>; sleep 5; done`.
 The drops can be observed on the console as seen below:
 
 ![NO_SOCKET drop table](./images/NO_SOCKET_table.png)
 
 ![NO_SOCKET drop overview](./images/NO_SOCKET_overview.png)
 
-- OVS_DROP_LAST_ACTION drop reason: OVS packet drops can be observed on RHEL9 and above. It
+- `OVS_DROP_LAST_ACTION` drop reason: OVS packet drops can be observed on RHEL9 and above. It
 can be emulated by running the iperf command with network-policy set to drop on a particular port. These drops can be observed on the console as seen below:
 
 ![OVS drop table](./images/OVS_table.png)

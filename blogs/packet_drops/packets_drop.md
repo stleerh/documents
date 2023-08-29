@@ -24,18 +24,14 @@ stack. These tracepoints can help intercept packets at specific events,
 such as when they are received, forwarded, or transmitted.
 By analyzing the events around packet drops, you can gain insight into the
 reasons behind them.
-In network observability we are using `tracepoint/skb/kfree_skb` tracepoint hook
-to detect when packets are dropped, the reason for packets drop and reconstruct
-the flow and enrich it with drop metadata such as packets and bytes statistics,
-for TCP only the latest TCP connection state as well as the TCP connection flags
+In network observability we are using the `tracepoint/skb/kfree_skb` tracepoint hook
+to detect when packets are dropped, determine the reason why packets drop and reconstruct
+the flow by enriching it with drop metadata such as packets and bytes statistics,
+For TCP, only the latest TCP connection state as well as the TCP connection flags
 are added.
-Packets drop ebpf hook supports TCP, UDP, SCTP, ICMPv4 and ICMPv6 protocols.
-There are two main categories for packet drops, core subsystem drops which cover
-most of the host drop reasons; for the complete list please refer to
-https://github.com/torvalds/linux/blob/master/include/net/dropreason-core.h
-and OVS based drops which is a recent kernel enhancement; for reference please 
-checkout the following link
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/openvswitch/drop.h.
+The packet drops eBPF hook supports TCP, UDP, SCTP, ICMPv4 and ICMPv6 protocols.
+There are two main categories for packet drops. the first category, core subsystem drops covers most of the host drop reasons; for the complete list please refer to [drop-reason](https://github.com/torvalds/linux/blob/master/include/net/dropreason-core.h).
+Second, there are OVS based drops, which is a recent kernel enhancement; for reference please checkout the following link [OVS-drop-reason](https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/openvswitch/drop.h).
 
 ## Kernel support
 
@@ -44,9 +40,9 @@ kernel version. Older kernel will ignore this feature if its configured.
 
 ## How to enable packet drops
 
-By default packets drop detection is disabled because it requires
+By default packets drops detection is disabled because it requires
 `privileged` access to the host kernel. To enable the feature we need 
-to create a flowcollector object with the following fields enabled in eBPF config
+to create a `FlowCollector`` object with the following fields enabled in eBPF config
 section
 
 ```yaml
@@ -65,26 +61,26 @@ spec:
 
 ## A quick tour in the UI
 
-Once `PacketsDrop` feature enabled, the Console plugin will automatically adapt to provide
-additionnal filters and show informations across views.
+Once the `PacketsDrop` feature enabled, the Console plugin will automatically adapt to provide
+additionnal filters and show information across Netflow Traffic page views.
 
 Open your OCP Console and move to 
 `Administrator view` -> `Observe` -> `Network Traffic` page as usual.
 
-A new query option will show to filter flows by their drop status:
+Now, a new query option is available to filter flows by their drop status:
 
 ![drop filter query option](./images/drop_filter_query_option.png)
 - Fully dropped shows the flows that have 100% dropped packets
 - Containing drops shows the flows having at least one packet dropped
 - Without drops show the flows having 0% dropped packets
-- All shows everything
+- All shows all of the above
 
-Two new filters, `Packet drop TCP state` and `Packet drop latest cause` will be available 
+Two new filters, `Packet drop TCP state` and `Packet drop latest cause` are available 
 in the common section:
 
 ![drop state & cause filters](./images/drop_state_cause_filters.png)
 
-The first one will allow you to set TCP state filter:
+The first one will allow you to set the TCP state filter:
 
 ![state filter](./images/state_filter.png)
 
@@ -100,7 +96,7 @@ The second one will let you pick causes to filter on:
 `NO_SOCKET`, `PKT_TOO_SMALL`
 
 ### Overview
-New graphs will be introduced in the `advanced options` -> `manage panels` popup:
+New graphs are introduced in the `advanced options` -> `manage panels` popup:
 
 ![advanced options](./images/advanced_options.png)
 
@@ -122,13 +118,13 @@ last graph using the kebab menu
 
 ### Traffic flows
 The table view shows the number of `bytes` and `packets` sent in green and the related numbers
-dropped in red. On top of that, you can get details about the drop in the side panel that will
-bring you to the proper documentation.
+dropped in red. Additionally, you can get details about the drop in the side panel that
+brings you to the proper documentation.
 
 ![drop table](./images/drop_table.png)
 
 ### Topology
-Last but not least, the topology view display edges containing drops in red. That's useful 
+Last but not least, the topology view displays edges containing drops in red. That's useful 
 especially when digging on a specific drop reason between two resources.
 
 ![drop topology](./images/drop_topology.png)
@@ -141,8 +137,7 @@ The drops can be observed on the console as seen below:
 
 ![NO_SOCKET drop overview](./images/NO_SOCKET_overview.png)
 
-- `OVS_DROP_LAST_ACTION` drop reason: OVS packet drops can be observed on RHEL9 and above. It
-can be emulated by running the iperf command with network-policy set to drop on a particular port. These drops can be observed on the console as seen below:
+- `OVS_DROP_LAST_ACTION` drop reason: OVS packet drops can be observed on RHEL9.2 and above. It can be emulated by running the iperf command with network-policy set to drop on a particular port. These drops can be observed on the console as seen below:
 
 ![OVS drop table](./images/OVS_table.png)
 
@@ -152,4 +147,4 @@ can be emulated by running the iperf command with network-policy set to drop on 
 
 ## Resource impact of using PacketDrop
 The performance impact of using PacketDrop enabled with the Network Observability operator
-is on the flowlogs-pipeline(FLP) component. FLP uses higher CPU(about a 22% increase) and more memory(about a 9% increase) than baseline whereas there is not much considerable impact(less than 3% increase) on other components of the operator.
+is noticeable on the flowlogs-pipeline(FLP) component using ~22% and ~9% more vCPU and memory respectively when compared to baseline whereas the impact on other components in not significant (less than 3% increase).

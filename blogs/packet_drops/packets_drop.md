@@ -30,8 +30,8 @@ the flow by enriching it with drop metadata such as packets and bytes statistics
 For TCP, only the latest TCP connection state as well as the TCP connection flags
 are added.
 The packet drops eBPF hook supports TCP, UDP, SCTP, ICMPv4 and ICMPv6 protocols.
-There are two main categories for packet drops. the first category, core subsystem drops covers most of the host drop reasons; for the complete list please refer to [drop-reason](https://github.com/torvalds/linux/blob/master/include/net/dropreason-core.h).
-Second, there are OVS based drops, which is a recent kernel enhancement; for reference please checkout the following link [OVS-drop-reason](https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/openvswitch/drop.h).
+There are two main categories for packet drops. The first category, core subsystem drops,covers most of the host drop reasons; for the complete list please refer to [drop-reason](https://github.com/torvalds/linux/blob/master/include/net/dropreason-core.h).
+Second, there are OVS-based drops, which is a recent kernel enhancement; for reference please checkout the following link [OVS-drop-reason](https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/openvswitch/drop.h).
 
 ## Kernel support
 
@@ -42,7 +42,7 @@ kernel version. Older kernel will ignore this feature if its configured.
 
 By default packets drops detection is disabled because it requires
 `privileged` access to the host kernel. To enable the feature we need 
-to create a `FlowCollector`` object with the following fields enabled in eBPF config
+to create a `FlowCollector` object with the following fields enabled in eBPF config
 section
 
 ```yaml
@@ -61,8 +61,8 @@ spec:
 
 ## A quick tour in the UI
 
-Once the `PacketsDrop` feature enabled, the Console plugin will automatically adapt to provide
-additionnal filters and show information across Netflow Traffic page views.
+Once the `PacketsDrop` feature is enabled, the OCP console plugin automatically adapts to provide
+additional filters and show information across Netflow Traffic page views.
 
 Open your OCP Console and move to 
 `Administrator view` -> `Observe` -> `Network Traffic` page as usual.
@@ -70,10 +70,10 @@ Open your OCP Console and move to
 Now, a new query option is available to filter flows by their drop status:
 
 ![drop filter query option](./images/drop_filter_query_option.png)
-- Fully dropped shows the flows that have 100% dropped packets
-- Containing drops shows the flows having at least one packet dropped
-- Without drops show the flows having 0% dropped packets
-- All shows all of the above
+- `Fully dropped` shows the flows that have 100% dropped packets
+- `Containing drops` shows the flows having at least one packet dropped
+- `Without drops` show the flows having 0% dropped packets
+- `All` shows all of the above
 
 Two new filters, `Packet drop TCP state` and `Packet drop latest cause` are available 
 in the common section:

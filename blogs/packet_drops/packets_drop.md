@@ -133,10 +133,6 @@ especially when digging on a specific drop reason between two resources.
 
 ![drop topology](./images/drop_topology.png)
 
-## Performance impact of using PacketDrop
-The performance impact of using PacketDrop enabled with the Network Observability operator
-is on the flowlogs-pipeline(FLP) component. FLP uses higher CPU than baseline(about a 22% increase) whereas there is not much considerable impact(less than 3% increase) on other components of the operator.
-
 ## Potential use-case scenarios
 - NO_SOCKET drop reason: There might be packet drops observed due to the destination port being not reachable. This can be emulated by running a curl command on a node to an unknown port `while : ; do curl <another nodeIP>:<unknown port>; sleep 5; done`.
 The drops can be observed on the console as seen below:
@@ -153,3 +149,7 @@ can be emulated by running the iperf command with network-policy set to drop on 
 ![OVS drop topology](./images/OVS_topology.png)
 
 ![OVS drop overview](./images/OVS_overview.png)
+
+## Resource impact of using PacketDrop
+The performance impact of using PacketDrop enabled with the Network Observability operator
+is on the flowlogs-pipeline(FLP) component. FLP uses higher CPU(about a 22% increase) and more memory(about a 9% increase) than baseline whereas there is not much considerable impact(less than 3% increase) on other components of the operator.

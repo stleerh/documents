@@ -61,14 +61,13 @@ spec:
     ebpf:
       privileged: true
       features:
-        - PacketsDrop
+        - PacketDrop
 ```
 
 ## A quick tour in the UI
 
-Once the `PacketsDrop` feature is enabled, the OCP console plugin automatically
-adapts to provide additional filters and show information across Netflow Traffic
-page views.
+Once the `PacketDrop` feature is enabled, the OCP console plugin automatically adapts to provide
+additional filters and show information across Netflow Traffic page views.
 
 Open your OCP Console and move to
 `Administrator view` -> `Observe` -> `Network Traffic` page as usual.

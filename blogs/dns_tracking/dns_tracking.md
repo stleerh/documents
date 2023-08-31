@@ -105,9 +105,9 @@ New graphs are introduced in the `advanced options` -> `manage panels` popup:
 
 ![advanced options 1](./images/advanced_options1.png)
 
-- Top 5 average DNS latencies
-- Top 5 DNS response code
-- Top 5 DNS response code stacked with total
+- Top X average DNS latencies
+- Top X DNS response code
+- Top X DNS response code stacked with total
 
 ![dns graphs 1](./images/dns_graphs1.png)
 ![dns graphs 2](./images/dns_graphs2.png)

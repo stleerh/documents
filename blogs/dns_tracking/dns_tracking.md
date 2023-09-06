@@ -7,7 +7,9 @@ By: Julien Pinsonneau, Mehul Modi and Mohamed S. Mahmoud
 In today's interconnected digital landscape, Domain Name System (DNS) tracking
 plays a crucial role in networking and security. DNS resolution is a fundamental
 process that translates human-readable domain names into IP addresses, enabling
-communication between devices and servers. For operations excellence, DNS
+communication between devices and servers. It can also be a security vulnerability
+and a tool for firewalling and blocking access to content, depending on how it is
+configured and manipulated. For operations excellence, DNS
 resolution benefits from monitoring and analysis, which can be achieved through
 innovative technologies like eBPF (extended Berkeley Packet Filter). In this
 blog post, we'll delve into the world of DNS tracking using eBPF tracepoint
@@ -17,9 +19,12 @@ including network monitoring and security enhancement.
 ## Understanding DNS Resolution
 
 Before diving into the specifics of eBPF tracepoint hooks, let's briefly recap
-how DNS resolution works. When you enter a website's domain name, such as
-www.example.com, in your browser, your computer needs to find the corresponding
-IP address. This process involves multiple steps, including querying DNS
+how DNS resolution works. In a Kubernetes architecture, DNS (Domain Name System)
+plays a critical role in enabling communication between various components and
+services within the cluster.
+Kubernetes uses DNS to facilitate service discovery and to resolve domain names
+to the corresponding IP addresses of pods or services.
+This process involves multiple steps, including querying DNS
 servers, caching responses, obtaining the IP address to establish a connection
 and caching response for future re-occurrence of the same DNS query.
 

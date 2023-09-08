@@ -19,9 +19,8 @@ including network monitoring and security enhancement.
 ## Understanding DNS Resolution
 
 Before diving into the specifics of eBPF tracepoint hooks, let's briefly recap
-how DNS resolution works. In a Kubernetes architecture, DNS (Domain Name System)
-plays a critical role in enabling communication between various components and
-services within the cluster.
+how DNS resolution works. In a Kubernetes architecture, DNS plays a critical role
+in enabling communication between various components and services within the cluster.
 Kubernetes uses DNS to facilitate service discovery and to resolve domain names
 to the corresponding IP addresses of pods or services.
 This process involves multiple steps, including querying DNS

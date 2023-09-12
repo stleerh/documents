@@ -60,6 +60,9 @@ echo ""
 echo "To delete the S3 bucket, run:"
 echo "aws s3 rm s3://$S3_NAME --recursive"
 echo "aws s3 rb s3://$S3_NAME"
+echo ""
+echo "To delete remaining PVC, run:"
+echo "kubectl delete -n $NAMESPACE pvc --all"
 
 
 echo ""

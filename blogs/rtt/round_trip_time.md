@@ -84,13 +84,21 @@ The table view shows the `Flow RTT` in both column and side panel.
 
 ![rtt table](./images/rtt_table.png)
 
+### Topology
+
+Last but not least, the topology view displays average `RTT` latency on edges.
+Clicking on a node or an edge will allow you to see per direction metrics and
+the related graph.
+
+![rtt topology](./images/rtt_topology.png)
+
 ### Future improvments
 
 Here is a non exhaustive list of future improvments coming for a full featured
 Round Trip Time analysis:
 
 - Max / P90 / P99 graphs
-- RTT in topology view
+- Latest / Max RTT in topology view
 - Prometheus metrics and alerting
 
 ## Feedback

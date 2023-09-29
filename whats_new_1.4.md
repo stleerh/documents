@@ -1,6 +1,6 @@
 # What's New in Network Observability 1.4
 
-OpenShift Container Platform (OCP) is the leading Kubernetes environment for managing container-based applications.  However, this is just the core platform.  If you go to **OperatorHub** on OpenShift Web console (UI), you will see hundreds of *optional* operators, which are analogous to extensions for your browser.  Buried in this operator gold mine is one called Network Observability.  <img src="images/netobserv_operator.png" alt="Network Observability operator" width="300" style="float: right; padding: 5px 0 5px 15px;">
+OpenShift Container Platform (OCP) is the leading Kubernetes environment for managing container-based applications.  However, this is just the core platform.  If you go to **OperatorHub** on OpenShift Web console (UI), you will see hundreds of *optional* operators, which are analogous to extensions for your browser.  Buried in this operator gold mine is one called Network Observability.  <img src="images/netobserv_operator.png" alt="Network Observability operator" width="300" align="right">
 
 Network Observability 1.4, as the release number suggests, is not new.  The team has put out four feature releases since its first general availability back in January 2023.  It has grown significantly since I wrote a [blog about Network Observability 1.0](https://cloud.redhat.com/blog/check-out-the-new-network-observability-support-in-openshift-4.12).
 
@@ -35,7 +35,7 @@ All of the 1.4 features can be put into four categories.  They are:
 
 SR-IOV is a hardware standard to virtualize a NIC. In netdevice mode, the eBPF agent can now provide traffic flows that go through these interfaces.  To enable this feature, when creating the FlowCollector instance, you must enable *privileged* mode. This is in the **Create FlowCollector** form view under ***agent > ebpf > privileged***.
 
-<img src="images/ibm_z15_mainframe.png" alt="IBM Z" width="300" style="float: right; padding: 5px 0 5px 15px;">
+<img src="images/ibm_z15_mainframe.png" alt="IBM Z" width="300" align="right">
 
 ### IBM Z
 
@@ -59,14 +59,14 @@ The **Overview** tab has several new packet drop graphs, two of which are shown 
 
 Click **Show advanced options** (which then becomes *Hide advanced options*) to reveal **Manage panels**.  Click this link to choose what graphs to display.
 
-<img src="images/managed_panels.png" alt="Managed panels" width="300" style="margin: 10px auto 25px auto">
+<p align="center"><img src="images/managed_panels.png" alt="Managed panels" width="300"></p>
 
 The **Traffic flows** tab shows the bytes and packet counts of what has been dropped.  The **Topology** tab displays a red link between vertices where packet drops have occurred.
 
 
 <p float="left">
-<img src="images/table-drops.png" alt="Traffic flows - Packet drops" width="500" style="display: inline">
-<img src="images/topology-drops.png" alt="Traffic flows - Topology drops" width="400" style="display: inline">
+    <img src="images/table-drops.png" alt="Traffic flows - Packet drops" width="500" style="display: inline">
+    <img src="images/topology-drops.png" alt="Traffic flows - Topology drops" width="400" style="display: inline">
 </p>
 
 ### DNS tracking information
@@ -107,17 +107,17 @@ To the left of the filter field (see figure above on **Query options**) is a new
 
 When you click *Swap* in the filter section, it changes all the source values to dest and vice versa.  This makes it convenient to do this operation.
 
-<img src="images/swap_and_back_and_forth.png" alt="Swap and Back and Forth" style="margin: 10px auto 25px auto">
+<img src="images/swap_and_back_and_forth.png" alt="Swap and Back and Forth">
 
 ### "Back and forth" to include return traffic
 
 Before this change, **Query options** had a Reporter section where you chose Source, Destination, or Both.  For external traffic, you either got half the traffic or all the traffic duplicated depending on your selection.  This now gives you two similar options.  Choose *One way* (default) to get the traffic exactly in one direction.  Choose *Back and forth* to let it figure out and do the right thing for you.  You don't have to think about ingress, egress... I digress!  The *Direction* column in the flows table will show one of *ingress*, *egress*, or the new *inner*, which indicates inter-node traffic.
 
+<p align="center"><img src="images/scope_slider.png" alt="scope slider" height="300" align="right"></p>
+
 ### Vertical slider for changing scopes in Topology
 
-<img src="images/scope_slider.png" alt="scope slider" height="300" style="float: right; padding: 5px 0 5px 15px; position: relative; top: -90px;">
-
-The scope in Topology determines what is shown for the vertices in the graph.  The highest level view is to show Kubernetes nodes for the vertices by selecting Node.  The next level is Namespace, followed by Owner (typically a Deployment, StatefulSet, or DaemonSet), and finally Resource for the specific pod to pod/service communication.  Prior to this, the selection was under **Query options**.  Now it is visible as a vertical slider on the topology.
+The scope in Topology determines what is shown for the vertices in the graph.  The highest level view is to show Kubernetes nodes for the vertices by selecting Node.  The next level is Namespace, followed by Owner (typically a Deployment, StatefulSet, or DaemonSet), and finally Resource for the specific pod to pod/service communication.  Prior to this, the selection was under **Query options**.  Now it is visible as a vertical slider on the topology as shown on the right.
 
 
 ## Performance and scalability

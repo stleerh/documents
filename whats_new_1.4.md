@@ -94,7 +94,7 @@ The **Overview** tab has two new RTT graphs shown below.
 
 ![Overview - RTT](images/overview-rtt.png)
 
-The **Traffic flows** tab adds the *Flow RTT* column.  In the table below, it filters and displays all flows that take 1 millisecond or more (the value is in nanoseconds).
+The **Traffic flows** tab adds the *Flow RTT* column.  In the table below, it filters and displays all flows that take more than 1 millisecond (the value is in nanoseconds).
 
 ![Traffic flows - RTT](images/table-rtt.png)
 

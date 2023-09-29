@@ -1,10 +1,10 @@
 # What's New in Network Observability 1.4
 
-OpenShift Container Platform (OCP) is the leading Kubernetes environment for managing container-based applications.  However, this is just the core platform.  If you go to **OperatorHub** on OpenShift Web console (UI), you will see hundreds of *optional* operators, which are analogous to extensions for your browser.  Buried in this operator gold mine is one called Network Observability.  <img src="images/netobserv_operator.png" alt="Network Observability operator" width="300" align="right">
+OpenShift Container Platform (OCP) is the leading Kubernetes environment for managing container-based applications.  However, this is just the core platform.  If you go to **OperatorHub** on OpenShift web console (UI), you will see hundreds of *optional* operators, which are analogous to extensions for your browser.  Buried in this operator gold mine is one called Network Observability.  <img src="images/netobserv_operator.png" alt="Network Observability operator" width="300" align="right">
 
-Network Observability 1.4, as the release number suggests, is not new.  The team has put out four feature releases since its first general availability back in January 2023.  It has grown significantly since I wrote a [blog about Network Observability 1.0](https://cloud.redhat.com/blog/check-out-the-new-network-observability-support-in-openshift-4.12).
+Network Observability 1.4, as the release number suggests, is not new.  The team has put out four feature releases since its first general availability back in January 2023.  It has grown significantly since I wrote a [blog about Network Observability 1.0](https://cloud.redhat.com/blog/check-out-the-new-network-observability-support-in-openshift-4.12).  This release coincides with OCP 4.14 but can be used as far back as 4.10.
 
-The focus of this blog are the new features in 1.4, but a quick word about Network Observability.  It is a tool that collects traffic flows using an eBPF agent and then enriches and stores them as logs and metrics to provide valuable insight and visualization into your network.  In case you've been living under a rock (I mean, a gold crystal) in the Linux world, [eBPF](https://en.wikipedia.org/wiki/EBPF) is the technology that allows you to extend the kernel capabilities without having to write a messy kernel module.  It uses various probes to get some really cool statistics that I will talk about later that would otherwise be difficult to get.
+The focus of this blog is the new features in 1.4, but a quick word about Network Observability.  It is a tool that collects traffic flows using an eBPF agent and then enriches and stores them as logs and metrics to provide valuable insight and visualization into your network.  In case you've been living under a rock (I mean, a gold crystal) in the Linux world, [eBPF](https://en.wikipedia.org/wiki/EBPF) is the technology that allows you to extend the kernel capabilities without having to write a messy kernel module.  It uses various probes to get some really cool statistics that would otherwise be difficult to get, which we will dive into later in this blog.
 
 ## Features
 
@@ -12,12 +12,12 @@ All of the 1.4 features can be put into four categories.  They are:
 
 1. Hardware
     - Support for SR-IOV interfaces
-    - Support on IBM Z architecture
+    - Support on [IBM Z](https://www.ibm.com/z) architecture
 
 2. Traffic
     - Packet drops
     - DNS tracking information
-    - Enhanced dashboards and export flows without Loki
+    - Export flows and dashboards without Loki
     - Enhancements to Network Observability dashboards
     - Round Trip Time (RTT) {developer preview}
 
@@ -49,7 +49,7 @@ On traffic features, Network Observability is providing additional information t
 
 The eBPF agent can get real-time packet drops per flow for TCP, UDP, SCTP, and ICMPv4/v6 (such as ping).  To enable this feature, when creating the FlowCollector instance, you must enable *privileged* mode and the *PacketDrop* feature. This is in the **Create FlowCollector** form view under ***agent > ebpf > privileged*** and ***agent > ebpf > features***.
 
-Now decide how you want to filter packet drops.  In **Observe > Network Traffic** under **Query options**, select whether to show flows that have all packets dropped, at least one packet dropped, no packets dropped, or no filter.  Be careful if you select "no packets dropped", as that means you won't see flows with packet drops.  Then in the filter field, there are new filters for the TCP state and the drop cause.  See the highlighted red areas below that it's referring to in Web console.
+Now decide how you want to filter packet drops.  In **Observe > Network Traffic** under **Query options**, select whether to show flows that have all packets dropped, at least one packet dropped, no packets dropped, or no filter.  Be careful if you select "no packets dropped", as that means you won't see flows with packet drops.  Then in the filter field, there are new filters for the TCP state and the drop cause.  See the highlighted red areas below that it's referring to in web console.  You also need to be running OCP 4.13 or higher.
 
 ![query option and filter](images/query_filter.png)
 
@@ -61,8 +61,7 @@ Click **Show advanced options** (which then becomes *Hide advanced options*) to 
 
 <p align="center"><img src="images/managed_panels.png" alt="Managed panels" width="300"></p>
 
-The **Traffic flows** tab shows the bytes and packet counts of what has been dropped.  The **Topology** tab displays a red link between vertices where packet drops have occurred.
-
+The **Traffic flows** tab shows the bytes and packet counts of what has been dropped in red.  The **Topology** tab displays a red link between vertices where packet drops have occurred.
 
 <p float="left">
     <img src="images/table-drops.png" alt="Traffic flows - Packet drops" width="500" style="display: inline">
@@ -77,11 +76,13 @@ Like the Packet Drops feature, there are new DNS graphs in the **Overview** tab.
 
 ![Overview - DNS](images/overview-dns.png)
 
-### Enhanced dashboards and export flows without Loki
+### Export flows and dashboards without Loki
 
 If you only want to export flows, it is no longer necessary to install Loki.  Without Loki and internal flow storage, the netobserv console plugin is not installed, which means you don't get the **Observe > Network Traffic** panel and hence no Overview graphs, Traffic flows table, and Topology.  You will still get flow metrics in **Observe > Dashboards**.
 
-Speaking of dashboards, in **Observe > Dashboards, NetObserv / Health**, there is a new Flows Overhead graph that shows the percentage of flows generated by Network Observability itself.  The dashboard under **NetObserv** was also changed to separate applications and infrastructure.
+### Enhancements to Network Observability dashboards
+
+Speaking of dashboards, in **Observe > Dashboards, NetObserv / Health** selection, there is a new Flows Overhead graph that shows the percentage of flows generated by Network Observability itself.  The dashboard under **NetObserv** was also changed to separate applications and infrastructure.
 
 ![Dashboards - Netobserv](images/dashboards-netobserv.png)
 
@@ -122,7 +123,7 @@ The scope in Topology determines what is shown for the vertices in the graph.  T
 
 ## Performance and scalability
 
-Measuring performance, scalability, and resource utilization is tricky business.  We currently have some [guidelines](https://docs.openshift.com/container-platform/4.13/networking/network_observability/configuring-operator.html#network-observability-resources-table_network_observability) on resource recommendations, but we plan to invest in improving performance and scalability, and reducing resources without compromising visibility that matters.
+Measuring performance, scalability, and resource utilization is tricky business.  We currently have some [guidelines](https://docs.openshift.com/container-platform/4.13/networking/network_observability/configuring-operator.html#network-observability-resources-table_network_observability) on resource recommendations with tests supporting up to 120 nodes.  We plan on investing more to improve performance, scalability, and reducing resources without compromising visibility that matters.
 
 
 ## Conclusion
@@ -132,4 +133,4 @@ I hope you enjoy the new features. This was a high level overview of this releas
 
 ---
 
-Special thanks to Julien Pinsonneau, Mohamed Mahmoud, Joel Takvorian, and Dave Gordon for providing feedback, advice, and ensuring accuracy in this article.
+Special thanks to Julien Pinsonneau, Mohamed Mahmoud, Joel Takvorian, Dave Gordon, and Sara Thomas for providing feedback, advice, and ensuring accuracy in this article.

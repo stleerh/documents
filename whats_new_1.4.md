@@ -1,6 +1,6 @@
 # What's New in Network Observability 1.4
 
-OpenShift Container Platform (OCP) is the leading Kubernetes environment for managing container-based applications.  However, this is just the core platform.  If you go to **OperatorHub** on OpenShift web console (UI), you will see hundreds of *optional* operators, which are analogous to extensions for your browser.  Buried in this operator gold mine is one called Network Observability.  <img src="images/netobserv_operator.png" alt="Network Observability operator" width="300" align="right">
+OpenShift Container Platform (OCP) is the leading Kubernetes environment for managing container-based applications.  However, this is just the core platform.  If you go to **OperatorHub** on OpenShift web console (UI), you will see hundreds of *optional* operators, which are analogous to extensions for your browser.  Buried in this operator gold mine is one called Network Observability.  <img src="images/netobserv_operator.png" alt="Network Observability operator" width="300" align="right" style="padding: 10px; padding-right: 0">
 
 Network Observability 1.4, as the release number suggests, is not new.  The team has put out four feature releases since its first general availability back in January 2023.  It has grown significantly since I wrote a [blog about Network Observability 1.0](https://cloud.redhat.com/blog/check-out-the-new-network-observability-support-in-openshift-4.12).  This release coincides with OCP 4.14 but can be used as far back as 4.11.
 
@@ -8,7 +8,7 @@ The focus of this blog is the new features in 1.4, but a quick word about Networ
 
 ## Features
 
-All of the 1.4 features can be put into four categories.  They are:
+All of the 1.4 features and enhancements can be put into four categories.  They are:
 
 1. Hardware
     - Support for SR-IOV interfaces
@@ -29,11 +29,20 @@ All of the 1.4 features can be put into four categories.  They are:
 
 4. Performance and scalability
 
+Some features require the Network Observability eBPF agent to be configured to enable that particular feature.  This is done when you create a Flow Collector instance.  After installing the Network Observability operator, click the **Flow Collector** link as shown below.
+
+![Network Observability - Installed Operator](images/netobserv-installed-operator.png)
+
+This brings up the **Create FlowCollector** panel.  Follow the steps for that feature to enable it.
+
+
 ## Hardware
 
 ### SR-IOV Interfaces
 
 SR-IOV is a hardware standard to virtualize a NIC. In netdevice mode, the eBPF agent can now provide traffic flows that go through these interfaces.  To enable this feature, when creating the FlowCollector instance, you must enable *privileged* mode. This is in the **Create FlowCollector** form view under ***agent > ebpf > privileged***.
+
+![eBPF Agent - Privileged](images/ebpf-agent-priv.png)
 
 <img src="images/ibm_z15_mainframe.png" alt="IBM Z" width="300" align="right">
 
@@ -43,11 +52,13 @@ In the last release, we added support for IBM Power and ARM.  We now officially 
 
 ## Traffic
 
-On traffic features, Network Observability is providing additional information that is directly relevant to troubleshooting issues.  We plan to publish more details about these features and how to use them in future blogs.
+On traffic features, Network Observability is providing additional information that is directly relevant to troubleshooting packet drops, DNS, and latency issues.  We plan to publish more details about these features and how to use them in future blogs.
 
 ### Packet drops
 
 The eBPF agent can get real-time packet drops per flow for TCP, UDP, SCTP, and ICMPv4/v6 (such as ping).  To enable this feature, when creating the FlowCollector instance, you must enable *privileged* mode and the *PacketDrop* feature. This is in the **Create FlowCollector** form view under ***agent > ebpf > privileged*** and ***agent > ebpf > features***.
+
+![eBPF Agent - Privileged / Features](images/ebpf-agent-priv-features.png)
 
 Now decide how you want to filter packet drops.  In **Observe > Network Traffic** under **Query options**, select whether to show flows that have all packets dropped, at least one packet dropped, no packets dropped, or no filter.  Be careful if you select "no packets dropped", as that means you won't see flows with packet drops.  Then in the filter field, there are new filters for the TCP state and the drop cause.  See the highlighted red areas below that it's referring to in web console.  You also need to be running OCP 4.13 or higher.
 
@@ -70,7 +81,7 @@ The **Traffic flows** tab shows the bytes and packet counts of what has been dro
 
 ### DNS tracking information
 
-DNS is one networking area that is the source of potential problems.  This feature provides information on DNS ID, latency, and response code and the ability to filter on these fields.  To enable this feature, when creating the FlowCollector instance, you must enable *privileged* mode and the *DNSTracking* feature. This is in the **Create FlowCollector** form view under ***agent > ebpf > privileged*** and ***agent > ebpf > features***.
+DNS is one networking area that is the source of potential problems.  This feature provides information on DNS ID, latency, and response code and the ability to filter on these fields.  To enable this feature, when creating the FlowCollector instance, you must enable *privileged* mode and the *DNSTracking* feature. This is in the **Create FlowCollector** form view under ***agent > ebpf > privileged*** and ***agent > ebpf > features***.  See the screenshot in the **Packet drops** section above.
 
 Like the Packet Drops feature, there are new DNS graphs in the **Overview** tab.  See above on how to display them.  There are also new DNS columns in the traffic flows table.
 
@@ -78,17 +89,21 @@ Like the Packet Drops feature, there are new DNS graphs in the **Overview** tab.
 
 ### Export flows and dashboards without Loki
 
-If you only want to export flows, it is no longer necessary to install Loki.  Without Loki and internal flow storage, the netobserv console plugin is not installed, which means you don't get the **Observe > Network Traffic** panel and hence no Overview graphs, Traffic flows table, and Topology.  You will still get flow metrics in **Observe > Dashboards**.
+If you only want to export flows from Kafka or to an IPFIX collector, it is no longer necessary to install Loki.  Without Loki and internal flow storage, the netobserv console plugin is not installed, which means you don't get the **Observe > Network Traffic** panel and hence no Overview graphs, Traffic flows table, and Topology.  You will still get flow metrics in **Observe > Dashboards**.
 
 ### Enhancements to Network Observability dashboards
 
-Speaking of dashboards, in **Observe > Dashboards, NetObserv / Health** selection, there is a new Flows Overhead graph that shows the percentage of flows generated by Network Observability itself.  The dashboard under **NetObserv** was also changed to separate applications and infrastructure.
+Speaking of dashboards, in **Observe > Dashboards, NetObserv / Health** selection, there is a new Flows Overhead graph that shows the percentage of flows generated by Network Observability itself.
+
+![Dashboards - Netobserv / Health](images/dashboards-netobserv-health.png)
+
+The dashboard under **NetObserv** was also changed to separate applications and infrastructure.
 
 ![Dashboards - Netobserv](images/dashboards-netobserv.png)
 
 ### Round Trip Time (RTT)
 
-Round Trip Time (RTT) is a development preview feature that shows the latency for the TCP handshake process on a per-flow basis.  To enable this feature, when creating the FlowCollector instance, you must enable the *FlowRTT* feature. This is in the **Create FlowCollector** form view under ***agent > ebpf > features***.  Note the privileged feature is not required.
+Round Trip Time (RTT) is a development preview feature that shows the latency for the TCP handshake process on a per-flow basis.  To enable this feature, when creating the FlowCollector instance, you must enable the *FlowRTT* feature. This is in the **Create FlowCollector** form view under ***agent > ebpf > features***.  See the screenshot in the **Packet drops** section above.  Note the privileged feature is not required.
 
 The **Overview** tab has two new RTT graphs shown below.
 
@@ -123,7 +138,7 @@ The scope in Topology determines what is shown for the vertices in the graph.  T
 
 ## Performance and scalability
 
-Measuring performance, scalability, and resource utilization is tricky business.  We currently have some [guidelines](https://docs.openshift.com/container-platform/4.13/networking/network_observability/configuring-operator.html#network-observability-resources-table_network_observability) on resource recommendations with tests supporting up to 120 nodes.  We plan on investing more to improve performance, scalability, and reducing resources without compromising visibility that matters.
+We are constantly looking to improve the performance and scalability of the operator at the same time while reducing the resource footprint without compromising on visibility that matters. We have published a set of [guidelines](https://docs.openshift.com/container-platform/4.13/networking/network_observability/configuring-operator.html#network-observability-resources-table_network_observability) on the same, and we are constantly looking to evolve this over a period of time.
 
 
 ## Conclusion
@@ -133,4 +148,4 @@ I hope you enjoy the new features. This was a high level overview of this releas
 
 ---
 
-Special thanks to Julien Pinsonneau, Mohamed Mahmoud, Joel Takvorian, Dave Gordon, and Sara Thomas for providing feedback, advice, and ensuring accuracy in this article.
+Special thanks to Julien Pinsonneau, Mohamed Mahmoud, Joel Takvorian, Dave Gordon, Sara Thomas, and Deepthi Dharwar for providing feedback, advice, and ensuring accuracy in this article.

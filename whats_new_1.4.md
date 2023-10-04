@@ -1,8 +1,8 @@
 # What's New in Network Observability 1.4
 
-OpenShift Container Platform (OCP) is the leading Kubernetes environment for managing container-based applications.  However, this is just the core platform.  If you go to **OperatorHub** on OpenShift web console (UI), you will see hundreds of *optional* operators, which are analogous to extensions for your browser.  Buried in this operator gold mine is one called Network Observability.  <img src="images/netobserv_operator.png" alt="Network Observability operator" width="300" align="right">
+OpenShift Container Platform (OCP) is the leading Kubernetes environment for managing container-based applications.  However, this is just the core platform.  If you go to **OperatorHub** on the OpenShift web console (UI), you will see hundreds of *optional* operators, which are analogous to extensions for your browser.  Buried in this operator gold mine is one called Network Observability.  <img src="images/netobserv_operator.png" alt="Network Observability operator" width="300" align="right">
 
-Network Observability 1.4, as the release number suggests, is not new.  The team has put out four feature releases since its first general availability back in January 2023.  It has grown significantly since I wrote a [blog about Network Observability 1.0](https://cloud.redhat.com/blog/check-out-the-new-network-observability-support-in-openshift-4.12).  This release coincides with OCP 4.14 but can be used as far back as 4.11.
+Network Observability 1.4, as the release number suggests, is not new.  The team has put out four feature releases since its first general availability back in January 2023.  It has grown significantly since I wrote a [blog about Network Observability 1.0](https://cloud.redhat.com/blog/check-out-the-new-network-observability-support-in-openshift-4.12).  This release supports OCP 4.11 and above.
 
 The focus of this blog is the new features in 1.4, but a quick word about Network Observability.  It is a tool that collects traffic flows using an eBPF agent and then enriches and stores them as logs and metrics to provide valuable insight and visualization into your network.  In case you've been living under a rock (I mean, a gold crystal) in the Linux world, [eBPF](https://en.wikipedia.org/wiki/EBPF) is the technology that allows you to extend the kernel capabilities without having to write a messy kernel module.  It uses various probes to get some really cool statistics that would otherwise be difficult to get, which we will dive into later in this blog.
 
@@ -103,7 +103,7 @@ The dashboard under **NetObserv** was also changed to separate applications and 
 
 ### Round Trip Time (RTT)
 
-Round Trip Time (RTT) is a development preview feature that shows the latency for the TCP handshake process on a per-flow basis.  To enable this feature, when creating the FlowCollector instance, you must enable the *FlowRTT* feature. This is in the **Create FlowCollector** form view under ***agent > ebpf > features***.  See the screenshot in the **Packet drops** section above on where to configure this.  Note the privileged feature is not required.
+Round Trip Time (RTT) is a development preview feature that shows the latency for the TCP handshake process on a per-flow basis.  To enable this feature, when creating the FlowCollector instance, you must enable the *FlowRTT* feature. This is in the **Create FlowCollector** form view under ***agent > ebpf > features***.  See the screenshot in the **Packet drops** section above on where to configure this.  Note the privileged feature is not required.  It is also recommended to set sampling to 1 (or a low value) in order to not miss the TCP handshaking packets (SYN and ACK).
 
 The **Overview** tab has two new RTT graphs shown below.
 

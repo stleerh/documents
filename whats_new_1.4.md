@@ -1,6 +1,6 @@
 # What's New in Network Observability 1.4
 
-OpenShift Container Platform (OCP) is the leading Kubernetes environment for managing container-based applications.  However, this is just the core platform.  If you go to **OperatorHub** on OpenShift web console (UI), you will see hundreds of *optional* operators, which are analogous to extensions for your browser.  Buried in this operator gold mine is one called Network Observability.  <img src="images/netobserv_operator.png" alt="Network Observability operator" width="300" align="right" style="padding: 10px; padding-right: 0">
+OpenShift Container Platform (OCP) is the leading Kubernetes environment for managing container-based applications.  However, this is just the core platform.  If you go to **OperatorHub** on OpenShift web console (UI), you will see hundreds of *optional* operators, which are analogous to extensions for your browser.  Buried in this operator gold mine is one called Network Observability.  <img src="images/netobserv_operator.png" alt="Network Observability operator" width="300" align="right">
 
 Network Observability 1.4, as the release number suggests, is not new.  The team has put out four feature releases since its first general availability back in January 2023.  It has grown significantly since I wrote a [blog about Network Observability 1.0](https://cloud.redhat.com/blog/check-out-the-new-network-observability-support-in-openshift-4.12).  This release coincides with OCP 4.14 but can be used as far back as 4.11.
 
@@ -81,7 +81,7 @@ The **Traffic flows** tab shows the bytes and packet counts of what has been dro
 
 ### DNS tracking information
 
-DNS is one networking area that is the source of potential problems.  This feature provides information on DNS ID, latency, and response code and the ability to filter on these fields.  To enable this feature, when creating the FlowCollector instance, you must enable *privileged* mode and the *DNSTracking* feature. This is in the **Create FlowCollector** form view under ***agent > ebpf > privileged*** and ***agent > ebpf > features***.  See the screenshot in the **Packet drops** section above.
+DNS is one networking area that is the source of potential problems.  This feature provides information on DNS ID, latency, and response code and the ability to filter on these fields.  To enable this feature, when creating the FlowCollector instance, you must enable *privileged* mode and the *DNSTracking* feature. This is in the **Create FlowCollector** form view under ***agent > ebpf > privileged*** and ***agent > ebpf > features***.  See the screenshot in the **Packet drops** section above on where to configure this.
 
 Like the Packet Drops feature, there are new DNS graphs in the **Overview** tab.  See above on how to display them.  There are also new DNS columns in the traffic flows table.
 
@@ -103,7 +103,7 @@ The dashboard under **NetObserv** was also changed to separate applications and 
 
 ### Round Trip Time (RTT)
 
-Round Trip Time (RTT) is a development preview feature that shows the latency for the TCP handshake process on a per-flow basis.  To enable this feature, when creating the FlowCollector instance, you must enable the *FlowRTT* feature. This is in the **Create FlowCollector** form view under ***agent > ebpf > features***.  See the screenshot in the **Packet drops** section above.  Note the privileged feature is not required.
+Round Trip Time (RTT) is a development preview feature that shows the latency for the TCP handshake process on a per-flow basis.  To enable this feature, when creating the FlowCollector instance, you must enable the *FlowRTT* feature. This is in the **Create FlowCollector** form view under ***agent > ebpf > features***.  See the screenshot in the **Packet drops** section above on where to configure this.  Note the privileged feature is not required.
 
 The **Overview** tab has two new RTT graphs shown below.
 
@@ -138,7 +138,7 @@ The scope in Topology determines what is shown for the vertices in the graph.  T
 
 ## Performance and scalability
 
-We are constantly looking to improve the performance and scalability of the operator at the same time while reducing the resource footprint without compromising on visibility that matters. We have published a set of [guidelines](https://docs.openshift.com/container-platform/4.13/networking/network_observability/configuring-operator.html#network-observability-resources-table_network_observability) on the same, and we are constantly looking to evolve this over a period of time.
+We are constantly looking to improve the performance and scalability of the operator at the same time while reducing the resource footprint without compromising on visibility that matters. We have published a set of [guidelines](https://docs.openshift.com/container-platform/4.13/networking/network_observability/configuring-operator.html#network-observability-resources-table_network_observability) on the same, and we are looking to evolve this over a period of time.
 
 
 ## Conclusion

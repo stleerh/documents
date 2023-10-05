@@ -4,7 +4,7 @@
 
 By: Dushyant Behl and Julien Pinsonneau
 
-In OCP ensuring efficient packet delivery is crucial for maintaining smooth
+In OCP, ensuring efficient packet delivery is crucial for maintaining smooth
 communication between applications. However, due to various factors such
 as network congestion, misconfigured systems, or hardware limitations,
 connections may become slow, impacting overall performance.
@@ -94,7 +94,7 @@ the related graph.
 
 ### Future improvments
 
-Here is a non exhaustive list of future improvments coming for a full featured
+Here is a non exhaustive list of future improvements coming for a full featured
 Round Trip Time analysis:
 
 - Max / P90 / P99 graphs

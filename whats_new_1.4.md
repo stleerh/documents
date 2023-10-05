@@ -89,7 +89,7 @@ Like the Packet Drops feature, there are new DNS graphs in the **Overview** tab.
 
 ### Export flows and dashboards without Loki
 
-If you only want to export flows from Kafka or to an IPFIX collector, it is no longer necessary to install Loki.  Without Loki and internal flow storage, the netobserv console plugin is not installed, which means you don't get the **Observe > Network Traffic** panel and hence no Overview graphs, Traffic flows table, and Topology.  You will still get flow metrics in **Observe > Dashboards**.
+If you only want to export flows to a Kafka consumer or to an IPFIX collector, it is no longer necessary to install Loki.  Without Loki and internal flow storage, the netobserv console plugin is not installed, which means you don't get the **Observe > Network Traffic** panel and hence no Overview graphs, Traffic flows table, and Topology.  You will still get flow metrics in **Observe > Dashboards**.
 
 ### Enhancements to Network Observability dashboards
 
@@ -103,7 +103,7 @@ The dashboard under **NetObserv** was also changed to separate applications and 
 
 ### Round Trip Time (RTT)
 
-Round Trip Time (RTT) is a development preview feature that shows the latency for the TCP handshake process on a per-flow basis.  To enable this feature, when creating the FlowCollector instance, you must enable the *FlowRTT* feature. This is in the **Create FlowCollector** form view under ***agent > ebpf > features***.  See the screenshot in the **Packet drops** section above on where to configure this.  Note the privileged feature is not required.  It is also recommended to set sampling to 1 (or a low value) in order to not miss the TCP handshaking packets (SYN and ACK).
+Round Trip Time (RTT) is a development preview feature that shows the latency for the TCP handshake process on a per-flow basis.  To enable this feature, when creating the FlowCollector instance, you must enable the *FlowRTT* feature. This is in the **Create FlowCollector** form view under ***agent > ebpf > features***.  See the screenshot in the **Packet drops** section above on where to configure this.  Note the eBPF *privileged* feature is not required.  It is also recommended to set sampling to 1 (or a low value) in order to not miss the TCP handshaking packets (SYN and ACK).
 
 The **Overview** tab has two new RTT graphs shown below.
 

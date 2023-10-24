@@ -8,15 +8,46 @@ In OCP, ensuring efficient packet delivery is crucial for maintaining smooth
 communication between applications. However, due to various factors such
 as network congestion, misconfigured systems, or hardware limitations,
 connections may become slow, impacting overall performance.
-Round Trip Time (RTT) is the duration, measured in milliseconds, from when
+Round Trip Time (RTT) is the duration, usually measured in milliseconds, from when
 a client sends a request to when it receives a response from a server.
 Mesuring RTT is important for monitoring network health and diagnosing issues.
 
 ## RTT calculation using eBPF
 
-// TODO: Explain how RTT is captured and calculed using time diffs
-// between initial SYN & ACK packets using flow_monitor hookpoint
-// Maybe also explain which are the limitations ?
+RTT calculations between a server and a client requires sending a packet from the
+server to the client and then back from client to the server.
+RTT is then calculated as the time measured between sending and receiving the packet back.
+RTT calculations gives a very good estimate on how the network is behaving in between
+two hops. In netobsev ebpf-agent, we use the same idea for calculating RTT but we do it
+for TCP connections which is also called TCP Based RTT calculations. 
+
+![TCP based RTT calculations](./images/tcp_rtt_calculations.png)
+
+In TCP, as shown in the diagram above, at the start of the connection,
+a client sends a SYN packet to the server with a random sequence number (X) and the 
+server responds with an ACK (X+1), along with the ACK, the server also sends a SYN
+packet of its own with a different sequence number (Y) to which client resonds
+with an ack (Y+1). This is what is called a three-way-handshake for establishing a 
+TCP connection and we use these SYN/ACK packet pairs at the start of the connection to
+calculate RTT between the server and the client.
+
+In our implementation,
+
+1. ebpf-agent keeps track of the SYN/ACK packet pairs crossing through the agent at the start of every TCP connection.
+
+1. For every SYN packet that gets detected at the `flow_monitor` hookpoint, the agent will capture standard 4-tuple information (src/dst port and ip addresses), packet sequence identifier and the interface it was detected on and saves it into a `flow_sequences` hashmap along with the timestamp of the packet detection.
+
+1. Now for every ACK packet that gets detected by the agent at the `flow_monitor` hookpoint, it checks by reversing the flow direction, if the 4-tuple information, the identifier (sequence id of ACK - 1) along with the interface id, is present in the `flow_sequences` hashmap, if so it will calculate the handshake RTT as,
+`rtt = ack-timestampack - syn-timestamp(from map)`
+
+We present the calculated RTT as part of the flow log information exported by the agent. Agent will report actual RTT for the flow if it is calculated and present (for tcp handshake packets), zero if it is not calculated (for non handshake packets or any other protocol)
+
+Please note that the RTT calculations can be done on both the endpoints (client and server) as both send a SYN and receive an ACK in the 3-way TCP handshake. 
+
+Currently our approcah calculates RTT only for the TCP handshakes packets so flows which are non TCP will not show RTT information. 
+Also, in the ebpf-agent we implement a sampling strategy which keeps one out of n (configurable) packets in the flow, so the design of RTT calculations currently require a high sampling rate to be used as a low sampling strategy can miss either SYN, ACK or both packets leading to no calculation of RTT.
+
+We plan to implement a different sampling strategy to bypass this issue and implement support for more protocols in the future.
 
 ## Potential Use Cases
 

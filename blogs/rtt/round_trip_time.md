@@ -35,7 +35,7 @@ In our implementation,
 
 1. ebpf-agent keeps track of the SYN/ACK packet pairs crossing through the agent at the start of every TCP connection.
 
-1. For every SYN packet that gets detected at the `flow_monitor` hookpoint, the agent will capture standard 4-tuple information (src/dst port and ip addresses), packet sequence identifier and the interface it was detected on and saves it into a `flow_sequences` hashmap along with the timestamp of the packet detection.
+2. For every SYN packet that gets detected at the `flow_monitor` hookpoint, the agent will capture standard 4-tuple information (src/dst ip addresses and ports), packet sequence identifier and the interface it was detected on and saves it into a `flow_sequences` hashmap along with the timestamp of the packet detection.
 
 1. Now for every ACK packet that gets detected by the agent at the `flow_monitor` hookpoint, it checks by reversing the flow direction, if the 4-tuple information, the identifier (sequence id of ACK - 1) along with the interface id, is present in the `flow_sequences` hashmap, if so it will calculate the handshake RTT as,
 `rtt = ack-timestampack - syn-timestamp(from map)`

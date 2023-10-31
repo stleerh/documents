@@ -37,7 +37,7 @@ In our implementation,
 
 2. For every SYN packet that gets detected at the `flow_monitor` hookpoint, the agent will capture standard 4-tuple information (src/dst ip addresses and ports), packet sequence identifier and the interface it was detected on and saves it into a `flow_sequences` hashmap along with the timestamp of the packet detection.
 
-1. Now for every ACK packet that gets detected by the agent at the `flow_monitor` hookpoint, it checks by reversing the flow direction, if the 4-tuple information, the identifier (sequence id of ACK - 1) along with the interface id, is present in the `flow_sequences` hashmap, if so it will calculate the handshake RTT as,
+3. Now for every ACK packet that gets detected by the agent at the `flow_monitor` hookpoint, it checks by reversing the flow direction, if the 4-tuple information, the identifier (sequence id of ACK - 1) along with the interface id, is present in the `flow_sequences` hashmap, if so it will calculate the handshake RTT as,
 `rtt = ack-timestampack - syn-timestamp(from map)`
 
 We present the calculated RTT as part of the flow log information exported by the agent. Agent will report actual RTT for the flow if it is calculated and present (for tcp handshake packets), zero if it is not calculated (for non handshake packets or any other protocol)

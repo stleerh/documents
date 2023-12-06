@@ -17,9 +17,7 @@ You have two options, either you use ACM policies to automate the install, or yo
 Note that this doesn't cover Loki installation, so in this mode Loki & Console plugin will be disabled. Of course it is possible to also automate Loki installation, by creating new policy objects. Feel free to contribute!
 
 ```bash
-oc apply -f ./examples/ACM/acm-policy-netobserv-1.4.yaml
-oc apply -f ./examples/ACM/acm-policy-flowcollector-v1beta1-noloki.yaml
-oc apply -f ./examples/ACM/acm-bindings.yaml
+oc apply -f ./examples/ACM/policies
 ```
 
 Then on each cluster you want to include, add the label "netobserv=true" if you haven't already done so. It will enable the policies for it, triggering automated install. You can do it from the console under Infrastructure > Clusters > Edit labels (on each row / kebab menu).
@@ -39,6 +37,8 @@ On each cluster:
         - workload_egress_packets_total
         - workload_ingress_packets_total
 ```
+
+### Next: Setup observability
 
 cf steps at https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.8/html/observability/observing-environments-intro#enabling-observability :
 

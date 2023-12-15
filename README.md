@@ -28,4 +28,18 @@ If you don't need the entire stack, you can just [check components](#repositorie
 
 ### Other links
 
+- [Blogs](./blogs/index.md): Blog articles
+- [Examples](./examples/): Various example configurations
+- [Hack](./hack/): Hack scripts
+- [ACM](./acm.md): Setup Advanced Cluster Management with NetObserv metrics
+- [CNO](./hack_cno.md): Hacks to deploy development version of the CNO and OVN-Kubernetes
+- [DEX](./hack_dex.md): Hacks on Dex
+- [Kafka](./kafka.md): Deploy Kafka on Openshift using Strimzi Operator
+- [Kind](./kind.md): Setup ovn-kubernetes on KIND
+- [Loki config](./loki_config.md): Custom Loki Configuration for NetObserv
+- [Loki microservices](./loki_microservices.md): Scalable loki deployment
+- [Loki operator](./loki_operator.md): Deploying NetObserv with the Loki Operator
+- [Loki simple](./loki_simple.md): Automatic deployment Loki with the Network Observability Operator
+- [Next](./next.md): Informal doc gathering ideas about potential next steps.
+- [Openshift](./openshift.md): Deploy using OpenShift Container Platform
 - [Sample apps](./sample_apps.md): a few suggestions to generate traffic, useful for testing NetObserv.

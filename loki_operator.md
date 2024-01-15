@@ -65,39 +65,22 @@ Then create a `LokiStack` in `netobserv` namespace. When using OpenShift, naviga
 Administrator view -> Operators -> Installed Operators -> Loki Operator -> LokiStack -> Create LokiStack
 
 - Name it `loki` (any name is fine, but you need to adapt the URLs below accordingly)
-- Choose the size. While not suitable for production, `1x.extra-small` is OK for testing / demo. Note that very small clusters (e.g. 3 worker nodes) require `1x.extra-small`, see [troubleshooting](#troubleshooting) section below.
+- Choose the size. While not suitable for production, `1x.demo` is OK for testing / demo (or `1x.extra-small` in operator 5.7). Note that very small clusters (e.g. 3 worker nodes) require `1x.demo`, see [troubleshooting](#troubleshooting) section below.
 - Set `Object Storage` -> `Secret` as noted above.
 - Set `Tenants Configuration` -> `Mode` to `openshift-network`.
 
 This will create `gateway`, `distributor`, `compactor`, `ingester`, `querier` and `query-frontend` components.
 
-To allow `flowlogs-pipeline` to write to the gateway and `network-observability-plugin` to read from the gateway, you will need to create related `ClusterRole` and `ClusterRoleBinding` using:
-
-```bash
-kubectl apply -f examples/loki-stack/role.yaml
-```
-
 ## NetObserv configuration
 
-Once the Loki stack is up and running, you need to configure NetObserv to communicate to Loki through its `gateway` service. Loki CA certificate must have been written in a configmap, so it will be used for TLS.
-
-Then you will be able to set the following configuration in `FlowCollector` for `network` tenant:
+Once the Loki stack is up and running, you need to configure NetObserv to communicate to Loki through its `gateway` service:
 
 ```yaml
   loki:
-    url: 'https://loki-gateway-http.netobserv.svc:8080/api/logs/v1/network/'
-    statusUrl: 'https://loki-query-frontend-http.netobserv.svc:3100'
-    tenantID: network
-    authToken: FORWARD
-    tls:
-      enable: true
-      caCert:
-        type: configmap
-        name: loki-gateway-ca-bundle
-        certFile: service-ca.crt
+    mode: LokiStack
+    lokiStack:
+      name: loki
 ```
-
-Previously you could set `authToken` to `HOST` instead of `FORWARD`, but this mode is now deprecated and not recommended.
 
 ### User access
 

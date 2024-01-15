@@ -14,5 +14,7 @@ spec:
     secret:
       name: lokistack-dev-s3
       type: s3
-  size: 1x.extra-small
+  size: 1x.demo
+  # For Loki 5.7, use extra-small
+  # size: 1x.extra-small
   storageClassName: gp2-csi

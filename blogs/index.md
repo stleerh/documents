@@ -7,3 +7,4 @@
 - [Real-Time Per Flow Packets Drop](./packet_drops/index.md)
 - [Secondary interface support](./secondary_interface/index.md)
 - [What's New in Network Observability 1.4](./whats_new_1.4/index.md)
+- [TCP Round Trip Time tracking](./rtt/index.md)

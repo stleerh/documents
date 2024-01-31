@@ -182,6 +182,6 @@ spec:
 
 #### For non cluster admins
 
-In most cases, non cluster admins shouldn't see this error as the configured input size limit should be long enough. However, it may still occur than users have access to many namespaces despite not being cluster admins. You may create a new group for these users, and configure the `LokiStack` tenant as shown above.
+In most cases, non cluster admins shouldn't see this error as the configured input size limit should be long enough. However, it may still occur than users have access to many namespaces despite not being cluster admins. You may create a new group for these users, and configure the `LokiStack` tenant as shown above. Beware that in that case, these users have access to all the flows, without namespace restriction.
 
 We are also working on an alternative to allow finer-grained RBAC access to NetObserv flows, which would allow to restrict accessible namespaces per user. This is being tracked [here](https://issues.redhat.com/browse/NETOBSERV-1324).

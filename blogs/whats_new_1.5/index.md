@@ -1,14 +1,14 @@
 # What's New in Network Observability 1.5
 
-Network Observability 1.5 is the next version of the operator from Red Hat that focuses on providing insights into networking.  There's an upstream version that runs on plain Kubernetes, but this blog will focus on using OpenShift Container Platform (OCP) and the OpenShift web console for the user interface.
+Network Observability 1.5 is the new version of the operator from Red Hat that focuses on providing insights into networking.  There's an upstream version that runs on plain Kubernetes, but this blog will focus on using OpenShift Container Platform (OCP) and the OpenShift web console for the user interface.
 
 I will highlight the most important new features of this release so if you want a summary of all the changes including bug fixes, check out the [release notes](https://docs.openshift.com/container-platform/4.15/network_observability/network-observability-operator-release-notes.html).  If you want some background of this product, read the [OpenShift documentation](https://docs.openshift.com/container-platform/4.15/network_observability/network-observability-overview.html) and various [Red Hat blogs](https://www.redhat.com/en/blog) on this topic, including my blog on the previous [1.4 release](https://www.redhat.com/en/blog/whats-new-in-network-observability-1.4).
 
-To get started, you should have an OpenShift cluster.  You will need to log in with a cluster-admin role.  Follow the steps at this [link](https://docs.openshift.com/container-platform/4.15/network_observability/installing-operators.html) to install **Network Observability** provided by Red Hat in **OperatorHub** on the OpenShift web console.
+To get started, you should have an OpenShift cluster.  You will need to log in with a cluster-admin role.  Follow the [documentation steps](https://docs.openshift.com/container-platform/4.15/network_observability/installing-operators.html) to install **Network Observability** provided by Red Hat in **OperatorHub** on the OpenShift web console.
 
 ## Feature Highlights
 
-Version 1.5 has significant improvements in ease-of-use and a number of features related to metrics.  The Flow Round Trip Time (RTT) feature that was in Technical Preview is now in General Availability (GA), which means it is fully supported.
+Version 1.5 has significant improvements in ease-of-use and a number of features related to graphs and metrics.  The Flow Round Trip Time (RTT) feature that was in Technical Preview is now in General Availability (GA), which means it is fully supported.
 
 If you've used Network Observability before, the first thing you might have noticed after installing the operator is that there are two APIs available instead of one (Figure 1).
 
@@ -43,7 +43,7 @@ Parameters are now exposed under "Console plugin configuration", particularly "Q
 ![Console plugin configuration](images/console_plugin_configuration.png)
 _<div style="text-align: center">Figure 3: Console plugin configuration</div>_
 
-Under "Agent configuration", there is no longer an agent type because the only supported agent is *eBPF*.  It is still possible to configure *IPFIX* through YAML, but support for OpenShift SDN as the Container Network Interface (CNI) which IPFIX requires, is also deprecated in OpenShift 4.15.
+Under "Agent configuration", there is no longer an agent type because the only supported agent is *eBPF*.  It is still possible to configure *IPFIX* through YAML.
 
 In "Processor configuration", the changes are to enable availability zones, cluster ID, and a "Metrics configuration" section to select a list of predefined metrics under the "include list" (Figure 4).
 
@@ -62,10 +62,12 @@ The new features and enhancements will be covered by going over the changes in t
 
 Graphs for Flow RTT and DNS Tracking, including support for DNS TCP (previously only DNS UDP), were added.  There are graphs for:
 
-- Top 5
-- Bottom 5
-- 90th percentile or the top 10% (P90)
-- 99th percentile or the top 1% (P99)
+- Top 5 and/or top total graph
+- Top 5 average graph using latest metrics or all metrics
+- Top 5 max graph
+- Top 5 90th percentile graph (P90)
+- Top 5 99th percentile graph (P99)
+- Bottom 5 min graph
 
 #### Manage panels selection
 

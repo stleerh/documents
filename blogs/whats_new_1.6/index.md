@@ -35,7 +35,7 @@ _<div style="text-align: center">Figure 4: Prometheus settings</div>_
 
 ## eBPF Agent Enhancements
 
-The eBPF Agent probes the network interfaces and generates flows when it sees network traffic.  There were a number of eBPF Agent changes in this release.  Let's go through them one-by-one.
+The eBPF Agent probes the network interfaces and generates flows when it sees network traffic.  There were a number of eBPF Agent enhancements made.  Let's go through them one-by-one.
 
 ### Deploy on specific nodes
 By default, the eBPF Agent is deployed on each node using a DaemonSet.  If it's certain that you don't need it to run on some nodes, you can control which nodes to deploy it on.  This is actually a [Kubernetes feature](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) in the scheduler that is now implemented in the eBPF Agent.  There are many ways to do this, and the following uses node affinity to deploy the eBPF Agent only on pods with a specific label.
@@ -83,7 +83,7 @@ If you want to generate flows (or not generate flows) for very specific data, yo
 Enter `oc edit flowcollector -n netobserv-privileged`.  Again, look for the `ebpf` section and add the rest of the lines starting at `flowFilter`.  The `cidr` specifies a network address and prefix.  The example refers to any traffic, but for a specific network, use something like 10.0.62.0/24.  The feature is limited to one filter and many of the attributes can only have one value.
 
 ### eBPF Agent metrics
-Statistics for eBPF Agent were added. This is in Web console under **Observe > Dashboards**.  Select **NetObserv / Health** in the Dashboard dropdown (Figure 5).  This has graphs for eviction rates, dropped flow rates and more.
+You can view statistics for eBPF Agent.  This is in Web console under **Observe > Dashboards**.  Select **NetObserv / Health** in the Dashboard dropdown (Figure 5).  There are graphs for eviction rates, dropped flow rates, and more.
 
 ![eBPF Agent statistics](images/ebpf_agent_statistics.png)
 _<div style="text-align: center">Figure 5: eBPF Agent statistics</div>_
@@ -101,5 +101,54 @@ _<div style="text-align: center">Figure 6: eBPF Agent configuration - Disable al
 Internally, the eBPF Agent uses the Traffic Control (TC) hook to probe the ingress and egress traffic on the interfaces.  In OCP 4.16, which upgrades RHEL to 9.4, it can leverage the enhanced TCx hook for performance gains.
 
 3. Always save DNS flags<br>
-If the *DNSTracking* feature is enabled, regardless of the sampling setting, it always saves the DNS id and flags.  Previously, it would discard this data if the flow doesn't exist.
+If the *DNSTracking* feature is enabled, regardless of the sampling setting, it always saves the DNS id and flags.  Previously, it would discard this data if the flow didn't exist.
+
+
+## Flow Collector Enhancements
+A few enhancements were made in Flow Collector.  They are:
+
+1. Not 'ip' filter<br>
+In **Observe > Network Traffic**, for the IP-related filter fields, such as SourceIP, Destination IP, Source Node IP, and Destination Node IP, you can filter by *not* matching or excluding that IP or range (Figure 7).
+
+![Not 'ip' filter](images/not_ip_filter.png)
+_<div style="text-align: center">Figure 7: Not 'ip' filter</div>_
+
+2. De-duplication of flows<br>
+When a flow is a duplicate on another interface, instead of having multiple copies of that flow data, only one is stored now.  It keeps track of the list of interfaces that refer to the flow data.  This greatly reduces the amount of storage.
+
+The raw JSON fields have been renamed and pluralized to `Interfaces` and `IfDirections`, since the type changed to a list from a single value.  Note the use of square brackets for the lists below.
+
+```
+  "IfDirections": [
+    0
+  ],
+  "Interfaces": [
+    "br-ex"
+  ],
+```
+
+3. Subnet labels<br>
+You can define a list of names for CIDRs (IP ranges and/or hosts).  When the CIDR matches, the name appears in the flow data as the `SrcSubnetLabel` or `DestSubnetLabel` field.
+
+YAML Example:
+
+```
+  processor:
+    subnetLabels:
+      customLabels:
+      - cidrs:
+        - 10.129.0.73/32
+        name: querier
+      openShiftAutoDetect: false
+```
+
+If you don't want to define names, you can enable the OpenShift auto-detect mode to identify the items as "Pods", "Services", "Machines" or "n/a" (not applicable).  You configure this in the Processor section of Flow Collector (Figure 8).
+
+![Subnet labels configuration](images/subnet_labels_configuration.png)
+_<div style="text-align: center">Figure 8: Subnet labels configuration</div>_
+
+Figure 9 shows the subnet label columns in the Traffic flow table when OpenShift auto-detect is enabled.
+
+![Subnet labels columns](images/subnet_labels_columns.png)
+_<div style="text-align: center">Figure 9: Subnet labels columns</div>_
 

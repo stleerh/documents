@@ -2,14 +2,14 @@
 
 Network Observability 1.6 was released on June 17, 2024.  Even though this is considered a minor version upgrade from 1.5, it is a significant release that could lower the barrier to adoption into production.
 
-But before we go further, for those of you new to Network Observability, NetObserv, for short, is an optional operator that provides a slew of capabilities to track and provide insight into your network traffic flows.  While it works on any Kubernetes cluster, it works even better in an OpenShift environment, which is what I will focus on in this article.  I will only discuss the new features in this release so if you want the full feature list, read the documentation on [About Network Observability](https://docs.openshift.com/container-platform/4.16/observability/network_observability/json-flows-format-reference.html).
+But before we go further, for those of you new to Network Observability, NetObserv, for short, is an optional operator that provides a slew of capabilities to track and provide insight into your network traffic flows.  While it works on any Kubernetes cluster, it works even better in an OpenShift environment, which is what I will focus on in this article.  I will only discuss the new features in this release so if you want the full feature list, read the documentation on [About Network Observability](https://docs.openshift.com/container-platform/4.16/observability/network_observability/network-observability-overview.html).
 
 
 ## Graphs and Logs Without Loki and Storage
 
-Let's get right to the crux of the issue.  Prior to 1.4, NetObserv required an external component called Loki as well as storage, such as an S3 bucket, to store logs.  These flow logs allowed NetObserv to provide a rich UI to display graphs, tables, and a topology.  The resources required by Loki can be significant, particularly if you have lots of traffic and are sampling all data, not to mention the storage required.  In 1.4 and 1.5, if you have your own observability platform and only need the flow logs data, you can simply export this data and not install Loki or provide storage.  When you do this, you essentially get no UI besides some minimal flow metrics in **Observe > Dashboards**, because the expectation is that your platform will provide the features and the visuals.
+Prior to 1.4, NetObserv required an external component called Loki as well as storage, such as an S3 bucket, to store logs.  These flow logs allowed NetObserv to provide a rich UI to display graphs, tables, and a topology.  The resources required by Loki can be significant, particularly if you have lots of traffic and are sampling all data, not to mention the storage required.  In 1.4 and 1.5, if you have your own observability platform and only need the flow logs data, you can simply export this data and not install Loki or provide storage.  When you do this, you essentially get no UI besides some minimal flow metrics in **Observe > Dashboards**, because the expectation is that your platform will provide the features and the visuals.
 
-This release changes that premise.  It brings back the graphs in the **Overview** panel and the topology in the **Topology** panel.  This is huge because the core of Network Observability is now fully functional at a fraction of the resources required when Loki is used!  It achieves this by creating Prometheus metrics from the flows and storing them at 5-minute intervals.
+This release changes that premise.  It brings back the graphs in the **Overview** panel and the topology in the **Topology** panel.  This is huge because the core of Network Observability is now fully functional at a fraction of the resources required when Loki is used!  It achieves this by creating Prometheus metrics from the flows and storing them at 15-second intervals.
 
 So what's the catch?  Without storing the flow logs as JSON data, there will be some impact.  The most notable is that there won't be a traffic flows table, because flows are no longer stored (Figure 1).
 
@@ -68,9 +68,9 @@ Now this will only deploy on nodes with the `ebpf-agent=true` label.  Set this l
 oc label nodes node-name ebpf-agent=true
 ```
 
-### Filter at eBPF level
+### Flow filter at eBPF level
 
-Network Observability always had great filtering capability in the **Network Traffic** panel.  However, that is done at the UI level, meaning the flows are still generated and stored, and hence resources are being used.  If resources are a major concern, consider this feature ***if*** the filtering fits your requirements.
+Network Observability always had great filtering capability in the **Network Traffic** panel.  However, that is done at the UI level, meaning the flows are still generated and stored, and hence resources are being consumed.  If resources are a major concern, consider this feature ***if*** the filtering fits your requirements.
 
 If you want to generate flows (or not generate flows) for very specific data, you can specify a single filter to do this.  Here's an example to only generate flows for network traffic on TCP port 6443.
 
@@ -85,7 +85,7 @@ If you want to generate flows (or not generate flows) for very specific data, yo
         protocol: TCP
 ```
 
-Enter `oc edit flowcollector -n netobserv-privileged`.  Again, look for the `ebpf` section and add the rest of the lines starting at `flowFilter`.  The `cidr` specifies a network address and prefix.  The example refers to any traffic, but for a specific network, use something like 10.0.62.0/24.  The feature is limited to one filter and many of the attributes can only have one value.
+Enter `oc edit flowcollector`.  Again, look for the `ebpf` section and add the rest of the lines starting at `flowFilter`.  The `cidr` specifies a network address and prefix.  The example refers to any traffic, but for a specific network, use something like 10.0.62.0/24.  The feature is limited to one filter and many of the attributes can only have one value.  For more details, see the [flowFilter reference](https://github.com/netobserv/network-observability-operator/blob/main/docs/flowcollector-flows-netobserv-io-v1beta2.adoc#specagentebpfflowfilter).
 
 ### eBPF Agent metrics
 
@@ -107,8 +107,8 @@ _<div style="text-align: center">Figure 6: eBPF Agent configuration - Disable al
 2. Use enhanced TCx hook<br>
 Internally, the eBPF Agent uses the Traffic Control (TC) hook to probe the ingress and egress traffic on the interfaces.  In OCP 4.16, which upgrades RHEL to 9.4, it can leverage the enhanced TCx hook for performance gains.
 
-3. Always save DNS flags<br>
-If the *DNSTracking* feature is enabled, regardless of the sampling setting, it always saves the DNS id and flags.  Previously, it would discard this data if the flow didn't exist.
+3. DNS Tracking improvement<br>
+Previously with the *DNSTracking* feature, it was unlikely to generate DNS statistics if sampling was configured to be greater than 1, because the probe expected to catch both the request and the response.  However, the request and response is only necessary to calculate DNS latency.  Therefore, this has been improved so that it will still save the DNS id and flags even if it only receives the response.  Note that there is no information saved on the request.
 
 
 ## Flow Collector Enhancements
@@ -136,34 +136,40 @@ _<div style="text-align: center">Figure 7: Not 'ip' filter</div>_
     ```
 
 3. Subnet labels<br>
-    You can define a list of names for CIDRs (IP ranges and/or hosts).  When the CIDR matches, the name appears in the flow data as the `SrcSubnetLabel` or `DestSubnetLabel` field.
-
-    YAML Example:
+    You can define a list of names for CIDRs (IP ranges and/or hosts).  When the CIDR matches, the name appears in the flow data as the `SrcSubnetLabel` or `DestSubnetLabel` field.  Here is an example.
 
     ```
       processor:
         subnetLabels:
           customLabels:
           - cidrs:
-            - 10.129.0.73/32  # provide a name for this host
-            name: querier
-          openShiftAutoDetect: false
+            - 200.1.1.1/32  # provide a name for this host
+            name: Ext_server
+          openShiftAutoDetect: true  # this is the default
     ```
 
-    If you don't want to define names, you can enable the OpenShift auto-detect mode to identify the items as "Pods", "Services", "Machines" or "n/a" (not applicable).  You configure this in the Processor section of Flow Collector (Figure 8).
+    Enter `oc edit flowcollector`.  Look for the `processor` section and add the rest of the lines starting at `subnetLabels`.  The Form view in Web console looks like Figure 8.
 
 ![Subnet labels configuration](images/subnet_labels_configuration.png)
     _<div style="text-align: center">Figure 8: Subnet labels configuration</div>_
 
-   Figure 9 shows the subnet label columns in the Traffic flow table when OpenShift auto-detect is enabled.
+   By default, the OpenShift auto-detect mode is enabled to identify internal CIDRs as "Pods", "Services", "Machines" or "n/a" for not applicable.  While CIDRs can be internal or external, they are typically external to allow you to provide a custom name for them.  If you use a naming convention such as prefixing "Ext_" for all cluster-external traffic, then you can create a custom metric for this.  Here's a PromQL that displays a graph of external traffic in bytes over a 1-minute period.
+
+   ```
+   sum(rate(netobserv_workload_egress_bytes_total{DstSubnetLabel=~"|Ext_.*"}[1m]))
+   ```
+
+   This assumes the `workload_egress_bytes_total` metric has been included in `processor.metrics.includeList`.  See my [Network Observability 1.5 blog](https://developers.redhat.com/articles/2024/03/20/whats-new-network-observability-15) on how to do this.
+
+   In the Traffic flow table, this is what you will see if you add the Subnet Label columns (Figure 9).
 
 ![Subnet labels columns](images/subnet_labels_columns.png)
-    _<div style="text-align: center">Figure 9: Subnet labels columns</div>_
+    _<div style="text-align: center">Figure 9: Subnet Label columns</div>_
 
 
 ## Custom Metrics
 
-In my [Network Observability 1.5 blog](https://developers.redhat.com/articles/2024/03/20/whats-new-network-observability-15), I covered the development preview of the FlowMetrics API.  While it's possible to take any [flow data labels](https://docs.openshift.com/container-platform/4.16/network_observability/json-flows-format-reference.html) and turn it into a Prometheus metric, that web page was updated to indicate which fields can be safely used as labels to avoid high cardinality.
+In my [Network Observability 1.5 blog](https://developers.redhat.com/articles/2024/03/20/whats-new-network-observability-15), I covered the development preview of the FlowMetrics API.  While it's possible to take any [flow data labels](https://docs.openshift.com/container-platform/4.16/observability/network_observability/json-flows-format-reference.html) and turn it into a Prometheus metric, that web page was updated to indicate which fields can be safely used as labels to avoid high cardinality.
 
 This feature is now GA, and includes more filtering options (see [reference](https://github.com/netobserv/network-observability-operator/blob/main/docs/FlowMetric.md)) and support for [dashboards in OpenShift](https://github.com/netobserv/network-observability-operator/blob/main/docs/Metrics.md#charts-openshift-only).  That link also has many more examples of using custom metrics.
 
@@ -172,7 +178,7 @@ This feature is now GA, and includes more filtering options (see [reference](htt
 
 This release has yet another significant technical preview feature called Network Observability CLI (NetObserv CLI).  It is a kubectl plug-in that effectively installs Network Observability from the command line but is text-based only.  When you exit the program, it cleans up and removes itself.  In other words, you can now run Network Observability on-demand!
 
-While it reuses much of the NetObserv code, it is separate from the Network Observability Operator.  This means even if you have NetObserv running, you can still run the NetObserv CLI independently.
+While it reuses much of the NetObserv code, it is separate from the Network Observability Operator.  This means even if you have NetObserv running, you can still run the NetObserv CLI independently.  For this preview, it only supports nodes running x64.
 
 It is also not just a subset of features of the Network Observability Operator.  There is an option to capture packets and save them in a pcap file to be used by a network analysis tool like Wireshark!  Here is a sample screenshot of NetObserv CLI that is filtering and displaying traffic on port 443 (Figure 10).
 
@@ -218,7 +224,7 @@ To stop the program, press ctrl-C.  More information about NetObserv CLI will be
 
 If you are hesitant about deploying Network Observability, fear not.  With Network Observability CLI, you can experiment and have it completely removed when you are done using it.  The second option lets you install Network Observability without Loki, while still providing the majority of the features of this operator.
 
-What are you waiting for?  Give it a try, and let us know what you think at the [discussion board](https://github.com/netobserv/network-observability-operator/discussions).
+What are you waiting for?  Give it a try, and let us know what you think on the [discussion board](https://github.com/netobserv/network-observability-operator/discussions).
 
 ---
 

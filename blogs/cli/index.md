@@ -420,7 +420,7 @@ Port-Forwards:
   nodejs-basic - http://127.0.0.1:4000
 ```
 
-Open the mitm proxy url and generate a query to your route. You will see queries listed in the proxy web UI with the the content displayed:
+Open the mitm proxy url and generate a query to your route. You will see queries listed in the proxy web UI with the content displayed:
 
 ![mitm proxy](./images/mitm_proxy.png)
 

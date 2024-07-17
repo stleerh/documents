@@ -18,7 +18,7 @@ Behind the scene, your local terminal is calling `oc run` to deploy the collecto
 
 ## A different approach for each scenario
 
-Let's first compare which deployment methods of the Network Observability stack bests fits with these example scenarios:
+Let's first compare which deployment methods of the Network Observability stack best fit with these example scenarios:
 
 | Deployment method  	  | Configuration     | Short debug session         | Overall observability on short period of time | Long term observability                   | Per flows details   | Packet capture (pcap)
 |---	                  |---                |---	                        |---                                            |---	                                      | ---                 |---

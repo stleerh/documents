@@ -4,7 +4,7 @@
 
 By: Julien Pinsonneau
 
-Installing an entire observability stack may be hard to handle and not worth in some cases. That's why we are introducing Network Observability CLI as developer preview ! 
+Installing an entire observability stack may be hard to handle and not worth in some cases. That's why we are introducing Network Observability CLI as a technical preview ! 
 This first version of the tool allow users to capture `flows` or `packets` running a simple command. It reuse the netobserv components without the need to install and configure operator(s).
 
 ## Architecture

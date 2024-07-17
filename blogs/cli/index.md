@@ -424,7 +424,7 @@ Open the mitm proxy url and generate a query to your route. You will see queries
 
 ![mitm proxy](./images/mitm_proxy.png)
 
-## Future improvments
+## Future improvements
 
 For now, the Network Observability CLI is only providing `capture commands` such as [many other observability projects](https://github.com/collabnix/kubetools?tab=readme-ov-file#observability) but it will be improve to embedd tools to facilitate your life as much as possible.
 

@@ -372,7 +372,7 @@ Open the generated pcap file using Wireshark and look for your IP as source for 
 ![wireshark unencrypted packets](./images/wireshark_unencrypted_pcap.png)
 
 This time, we can see the HTTP content and see the request URL and response. Since we have the entire payload, we cand check for any authentification header, cookie, encoding and so on that may be wrong. 
-This is usefull to identify traffic content but also to debug a deployment that may be misconfigured or requesting unexpected content on unencrypted connections.
+This is useful to identify traffic content but also to debug a deployment that may be misconfigured or requesting unexpected content on unencrypted connections.
 
 #### Encrypted traffic
 

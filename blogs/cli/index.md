@@ -38,7 +38,7 @@ To see flows in details, both CLI and Operators allows you to deep dive into the
 A plugin is mainly a script placed in your `PATH` and prefixed with the corresponding <cli+command> name such as `oc-netobserv`.
 Read more about [kubectl-plugins](https://kubernetes.io/docs/tasks/extend-kubectl/kubectl-plugins/) and [oc-plugins](https://docs.openshift.com/container-platform/4.15/cli_reference/openshift_cli/extending-cli-plugins.html#cli-installing-plugins_cli-extend-plugins).
 
-For the purepose of this article, the following commands assume you are using `oc`.
+For the purpose of this article, the following commands assume you are using `oc`.
 
 ### The krew way
 

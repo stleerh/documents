@@ -430,7 +430,7 @@ For now, the Network Observability CLI is only providing `capture commands` such
 
 We have in mind to improve the capture process by automatically finding ips and ports matching to the pods you are looking for and automatically filter on these.
 
-The packet capture needs to be improved to align with flows filter capabilities and facilitate decryption of traffic. We are also investigating on ways to embedd enriched information inside the pcap file format.
+The packet capture needs to be improved to align with flows filter capabilities and facilitate decryption of traffic. We are also investigating on ways to embed enriched information inside the pcap file format.
 
 Also, the CLI could hold additionnal functionnalities such as, installing and configuring the Network Observability Operator, in a step by step setup way, including Loki and Prometheus configurations.
 

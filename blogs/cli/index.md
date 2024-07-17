@@ -42,9 +42,7 @@ For the purpose of this article, the following commands assume you are using `oc
 
 ### The krew way
 
-```
-Krew itself is a kubectl plugin that is installed and updated via Krew (yes, Krew self-hosts).
-```
+> Krew itself is a kubectl plugin that is installed and updated via Krew (yes, Krew self-hosts).
 
 Follow the instructions on [krew.sigs.k8s.io](https://krew.sigs.k8s.io/docs/user-guide/setup/install/) official website.
 Once installed, run the following command to install netobserv:

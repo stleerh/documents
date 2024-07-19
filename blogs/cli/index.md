@@ -11,7 +11,7 @@ This first version of the tool allows users to capture `flows` or `packets` runn
 
 ![arch](./images/cli_architecture.png)
 
-The CLI deploys eBPF agents as DaemonSet embedding flowlogs pipeline in the same pods. These will collect either flows or packets and send these data to a collector pod. The collector pod will display the collected content during the capture and store flows as JSONs + sqlite database and packets as pcap file.
+The CLI deploys eBPF agents as a DaemonSet embedding flowlogs pipeline in the same pods. These collect either flows or packets and send these data to a collector pod. The collector pod displays the collected content during the capture. Flows are stored as JSON  and SQLite database files and packets are stored as pcap file(s).
 
 Behind the scene, your local terminal is calling `oc run` to deploy the collector and then `oc exec` for a distant terminal access. Finally, when you exit a capture using `CTRL + C`, the CLI runs `oc cp` command to copy the output files to your local machine.
 

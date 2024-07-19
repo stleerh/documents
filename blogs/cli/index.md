@@ -426,7 +426,7 @@ Open the mitm proxy url and generate a query to your route. You can see queries 
 
 For now, the Network Observability CLI is only providing `capture commands` such as [many other observability projects](https://github.com/collabnix/kubetools?tab=readme-ov-file#observability).  There are planned improvements to embed tools to facilitate your life as much as possible.
 
-We have in mind to improve the capture process by automatically finding ips and ports matching to the pods you are looking for and automatically filter on these.
+We have in mind to improve the capture process by automatically finding IP addresses and ports that match to the pods you are looking for and automatically filtering on these.
 
 The packet capture needs to be improved to align with flows filter capabilities and facilitate decryption of traffic. We are also investigating on ways to embed enriched information inside the pcap file format.
 

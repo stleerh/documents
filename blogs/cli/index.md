@@ -430,7 +430,7 @@ We have in mind to improve the capture process by automatically finding IP addre
 
 The packet capture needs to be improved to align with flows filter capabilities and facilitate decryption of traffic. We are also investigating ways to embed enriched information inside the pcap file format.
 
-Also, the CLI could hold additionnal functionnalities such as, installing and configuring the Network Observability Operator, in a step by step setup way, including Loki and Prometheus configurations.
+Also, the CLI could hold additional functionalities, such as installing and configuring the Network Observability Operator in a step-by-step setup, including Loki and Prometheus configurations.
 
 It could become 'yet another' toolset of observing and debugging tools such as [inspektor-gadget](https://github.com/inspektor-gadget/inspektor-gadget).
 

@@ -16,7 +16,7 @@ So what's the catch?  Without storing the flow logs as JSON data, there is some 
 ![Traffic flows grayed out](images/traffic_flows-grayed_out.png)
 _<div style="text-align: center">Figure 1: Traffic flows grayed out</div>_
 
-The other point to understand is that the metrics don't have information at the pod level so for example, in the topology, the **Resource** scope, which shows the pod to pod/service communication, does not exist (Figure 2).
+The other item is that metrics don't have information at the pod level so for example, in the topology, the **Zone** and **Cluster** scopes do not exist (Figure 2).
 
 ![Topology](images/topology-no_resources.png)
 _<div style="text-align: center">Figure 2: Topology - No "Resources"</div>_
@@ -72,7 +72,7 @@ oc label nodes node-name ebpf-agent=true
 
 Network Observability always had great filtering capability in the **Network Traffic** panel.  However, that is done at the UI level, meaning the flows are still generated and stored, and hence resources are being consumed.  If resources are a major concern, consider this feature ***if*** the filtering fits your requirements.
 
-If you want to generate flows (or not generate flows) for very specific data, you can specify a single filter to do this.  Here's an example to only generate flows for network traffic on TCP port 6443.
+To generate flows (or not generate flows) for very specific data, you can specify a single filter to do this.  Here's an example to only generate flows for network traffic on TCP port 6443.
 
 ```
   agent:
@@ -105,9 +105,12 @@ There is a new option in the FlowCollector to control whether an alert is shown 
 _<div style="text-align: center">Figure 6: eBPF Agent configuration - Disable alerts</div>_
 
 2. Use enhanced TCx hook<br>
-Internally, the eBPF Agent uses the Traffic Control (TC) hook to probe the ingress and egress traffic on the interfaces.  In OCP 4.16, which upgrades RHEL to 9.4, it can leverage the enhanced TCx hook for performance gains.
+Internally, the eBPF Agent uses the Traffic Control (TC) hook to probe the ingress and egress traffic on the interfaces.  In OCP 4.16, which upgrades RHEL to 9.4, it leverages the enhanced TCx hook for performance gains.
 
-3. DNS Tracking improvement<br>
+3. Mapping performance improvement<br>
+With RHEL 9.x, it leverages a new map (hash table) method for flows and packets to achieve significant performance improvement.
+
+4. DNS Tracking improvement<br>
 Previously with the *DNSTracking* feature, it was unlikely to generate DNS statistics if sampling was configured to be greater than 1, because the probe expected to catch both the request and the response.  However, the request and response is only necessary to calculate DNS latency.  Therefore, this has been improved so that it still saves the DNS id and flags even if it only receives the response.  Note that there is no information saved on the request.
 
 

@@ -2,7 +2,8 @@
 
 ![logo](./images/cli_logo.png)
 
-By: Julien Pinsonneau
+By: Julien Pinsonneau 
+Thanks to: Joël Takvorian and Sara Thomas for reviewing
 
 Installing an entire observability stack may be hard to handle and not worth the effort in some cases. That's why we are introducing Network Observability CLI as a technical preview ! 
 This first version of the tool allows users to capture `flows` or `packets` running a simple command. It reuses the netobserv components without the need to install and configure operator(s).

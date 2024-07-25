@@ -52,7 +52,7 @@ oc krew install netobserv
 
 ### From tar archive
 
-Download the latest version either from [github releases]((https://github.com/netobserv/network-observability-cli/releases)) or [developers.redhat.com](https://developers.redhat.com/content-gateway/rest/mirror2/pub/openshift-v4/clients/netobserv/latest).
+Download the latest version either from [github releases](https://github.com/netobserv/network-observability-cli/releases) or [developers.redhat.com](https://developers.redhat.com/content-gateway/rest/mirror2/pub/openshift-v4/clients/netobserv/latest).
 
 Then follow the instructions on [Installing and using CLI plugins](https://docs.openshift.com/container-platform/4.15/cli_reference/openshift_cli/extending-cli-plugins.html#cli-installing-plugins_cli-extend-plugins) from Openshift documentation.
 

@@ -432,7 +432,7 @@ The packet capture needs to be improved to align with flows filter capabilities 
 
 Also, the CLI could hold additional functionalities, such as installing and configuring the Network Observability Operator in a step-by-step setup, including Loki and Prometheus configurations.
 
-It could become 'yet another' toolset of observing and debugging tools such as [inspektor-gadget](https://github.com/inspektor-gadget/inspektor-gadget).
+It could become 'yet another' toolset of observing and debugging tools such as [inspektor-gadget](https://github.com/inspektor-gadget/inspektor-gadget) but fully tested and supported by Red Hat as part of the [Openshift Network Observability](https://docs.openshift.com/container-platform/4.16/observability/network_observability/network-observability-overview.html) .
 
 ## Feedback
 

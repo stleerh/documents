@@ -10,3 +10,4 @@
 - [TCP Round Trip Time tracking](./rtt/index.md)
 - [What's New in Network Observability 1.5](./whats_new_1.5/index.md)
 - [Performance fine-tuning - a deep dive in eBPF Agent metrics](./agent_metrics_perf/index.md)
+- [Network Events Monitoring](./network_events/index.md)

@@ -231,6 +231,8 @@ $ oc edit featuregates.config.openshift.io cluster
 ```
 
 ```yaml
+spec:
+  featureSet: TechPreviewNoUpgrade
 enabled:
 - name: OVNObservability
 ```

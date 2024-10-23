@@ -49,7 +49,6 @@ These are the other smaller but useful enhancements made to the eBPF Agent, the 
 - The eBPF flow filter allows simple filtering at the core level where it decides what flows to collect.  Here are the changes.
     - `ports`, `sourcePorts` or `destPorts`: Supports up to two TCP, UDP or SCTP ports.  Previously, it allowed only one port.
     - If `ports` is specified but not `protocol`, it filters on TCP and UDP flows.
-    - `pktDrops`: If `true`, remove flows with packet drops.
     - `tcpFlags`: Filter the flows with this TCP flag.  It must be one of "SYN", "SYN-ACK", "ACK", "FIN", "RST", "URG", "ECE", "CWR", "FIN-ACK", or "RST-ACK".
 
 - The Kubernetes service for DNS does a reverse proxy and maps to an internal port at the pod running DNS.  For the DNS Tracking feature to work end-to-end, specify the internal port value using the environment variable `DNS_TRACKING_PORT`.
